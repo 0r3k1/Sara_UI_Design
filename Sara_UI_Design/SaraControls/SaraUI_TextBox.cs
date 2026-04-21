@@ -12,20 +12,29 @@ namespace Sara_UI_Design.SaraControls {
     public partial class SaraUI_TextBox:UserControl {
         // Enums para personalización
         public enum InputType { Text, Password, Numeric, Multiline }
+        public enum SaraIconLocation { Left, Right }
 
-        // Fields (Campos restaurados)
+        // Fields de diseño
         private Color borderColor = Color.MediumSlateBlue;
         private int borderSize = 2;
         private bool underlinedStyle = false;
         private Color borderFocusColor = Color.HotPink;
         private bool isFocused = false;
         private int borderRadius = 0;
+
+        // Fields de Placeholder
         private string placeholderText = "";
         private bool isPlaceholder = false;
         private Color placeholderColor = Color.Gray;
         private Color mainForeColor = Color.Black;
-        private InputType type = InputType.Text;
         private InputType inputType = InputType.Text;
+        private InputType type = InputType.Text;
+
+        // Fields de Icono
+        private string iconName = "None";
+        private Color iconColor = Color.Gray;
+        private int iconSize = 20;
+        private SaraIconLocation iconLocation = SaraIconLocation.Left;
 
         // Eventos
         public event EventHandler _TextChanged;
@@ -34,6 +43,7 @@ namespace Sara_UI_Design.SaraControls {
             InitializeComponent();
             this.mainForeColor = this.ForeColor;
             ConfigureTextBoxEvents();
+            this.Padding = new Padding(10, 7, 10, 7); // Padding base
         }
 
         private void ConfigureTextBoxEvents() {
@@ -41,9 +51,25 @@ namespace Sara_UI_Design.SaraControls {
             textBox1.Enter += (s, e) => { isFocused = true; RemovePlaceholder(); this.Invalidate(); };
             textBox1.Leave += (s, e) => { isFocused = false; SetPlaceholder(); this.Invalidate(); };
             textBox1.KeyPress += textBox1_KeyPress;
-            // Otros eventos heredados
             textBox1.Click += (s, e) => this.OnClick(e);
         }
+
+
+        [Category("Sara UI Design")]
+        [TypeConverter(typeof(IconNameConverter))]
+        public string IconName {
+            get => iconName;
+            set { iconName = value; UpdatePadding(); this.Invalidate(); }
+        }
+
+        [Category("Sara UI Design")]
+        public Color IconColor { get => iconColor; set { iconColor = value; this.Invalidate(); } }
+
+        [Category("Sara UI Design")]
+        public int IconSize { get => iconSize; set { iconSize = value; UpdatePadding(); this.Invalidate(); } }
+
+        [Category("Sara UI Design")]
+        public SaraIconLocation IconLocation { get => iconLocation; set { iconLocation = value; UpdatePadding(); this.Invalidate(); } }
 
         // --- Propiedades de Diseño (RESTAURADAS) ---
 
@@ -126,7 +152,8 @@ namespace Sara_UI_Design.SaraControls {
         }
 
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e) {
-            if(type == InputType.Numeric && !char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar)) {
+            // Cambiado 'type' por 'inputType'
+            if(inputType == InputType.Numeric && !char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar)) {
                 e.Handled = true;
             }
             this.OnKeyPress(e);
@@ -139,7 +166,9 @@ namespace Sara_UI_Design.SaraControls {
                 isPlaceholder = true;
                 textBox1.Text = placeholderText;
                 textBox1.ForeColor = placeholderColor;
-                if(type == InputType.Password)
+
+                // Si es contraseña, quitamos los puntos para que se lea el mensaje (ej: "Contraseña")
+                if(inputType == InputType.Password)
                     textBox1.UseSystemPasswordChar = false;
             }
         }
@@ -149,42 +178,67 @@ namespace Sara_UI_Design.SaraControls {
                 isPlaceholder = false;
                 textBox1.Text = "";
                 textBox1.ForeColor = mainForeColor;
-                if(type == InputType.Password)
+
+                if(inputType == InputType.Password)
                     textBox1.UseSystemPasswordChar = true;
             }
         }
 
         // --- Dibujo Avanzado (OnPaint mejorado) ---
 
+        // --- Lógica de Padding Dinámico ---
+
+        private void UpdatePadding() {
+            // Si hay icono, aumentamos el padding del lado correspondiente para que el texto no lo tape
+            int left = 10;
+            int right = 10;
+            bool hasIcon = !string.IsNullOrEmpty(iconName) && iconName != "None";
+
+            if(hasIcon) {
+                if(iconLocation == SaraIconLocation.Left)
+                    left = iconSize + 15;
+                else
+                    right = iconSize + 15;
+            }
+
+            this.Padding = new Padding(left, 7, right, 7);
+        }
+
         protected override void OnPaint(PaintEventArgs e) {
             base.OnPaint(e);
-            Graphics graph = e.Graphics;
-            graph.SmoothingMode = SmoothingMode.AntiAlias;
+            Graphics g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
 
             Rectangle rectBorder = this.ClientRectangle;
-            // Inflamos hacia adentro según el grosor del borde para que no se corte
-            Rectangle rectInside = Rectangle.Inflate(rectBorder, -borderSize, -borderSize);
+            Color currentBorder = isFocused ? borderFocusColor : borderColor;
 
-            using(Pen penBorder = new Pen(isFocused ? borderFocusColor : borderColor, borderSize)) {
+            // 1. Dibujar el Borde (Redondeado o Subrayado)
+            using(Pen penBorder = new Pen(currentBorder, borderSize)) {
                 penBorder.Alignment = PenAlignment.Inset;
 
-                if(borderRadius > 1) {
+                if(borderRadius > 1 && !underlinedStyle) {
                     using(GraphicsPath pathBorder = GetFigurePath(rectBorder, borderRadius)) {
-                        this.Region = new Region(pathBorder); // Corta las esquinas del control
-                        if(underlinedStyle) {
-                            graph.Clear(this.BackColor);
-                            graph.DrawLine(penBorder, 0, this.Height - 1, this.Width, this.Height - 1);
-                        } else {
-                            graph.DrawPath(penBorder, pathBorder);
-                        }
+                        this.Region = new Region(pathBorder);
+                        g.DrawPath(penBorder, pathBorder);
                     }
                 } else {
                     this.Region = new Region(rectBorder);
                     if(underlinedStyle)
-                        graph.DrawLine(penBorder, 0, this.Height - 1, this.Width, this.Height - 1);
+                        g.DrawLine(penBorder, 0, this.Height - 1, this.Width, this.Height - 1);
                     else
-                        graph.DrawRectangle(penBorder, 0, 0, this.Width - 0.5F, this.Height - 0.5F);
+                        g.DrawRectangle(penBorder, 0, 0, this.Width - 0.5F, this.Height - 0.5F);
                 }
+            }
+
+            // 2. Dibujar el Icono de la IconLibrary
+            if(!string.IsNullOrEmpty(iconName) && iconName != "None") {
+                int iconX = (iconLocation == SaraIconLocation.Left) ? 10 : this.Width - iconSize - 10;
+                int iconY = (this.Height - iconSize) / 2;
+                Rectangle iconRect = new Rectangle(iconX, iconY, iconSize, iconSize);
+
+                // El icono brilla con el color de foco si está seleccionado
+                Color currentIconColor = isFocused ? borderFocusColor : iconColor;
+                SaraUI_IconLibrary.DrawIcon(iconName, g, iconRect, currentIconColor);
             }
         }
 
