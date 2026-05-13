@@ -5,6 +5,11 @@ using System.Windows.Forms;
 using System.ComponentModel;
 
 namespace Sara_UI_Design.SaraControls {
+
+    /// <summary>
+    /// Selector de fecha personalizado de la suite Sara UI con soporte para esquinas redondeadas, 
+    /// personalización de colores de fondo y bordes, e integración de iconos vectoriales.
+    /// </summary>
     public class SaraUI_DatePicker:DateTimePicker {
         // Fields
         private Color skinColor = Color.MediumSlateBlue;
@@ -14,37 +19,59 @@ namespace Sara_UI_Design.SaraControls {
         private int borderRadius = 10;
         private bool droppedDown = false;
 
+
         // Propiedades en Sara UI Design
+
+        /// <summary>
+        /// Obtiene o establece el color de fondo principal del control.
+        /// </summary>
         [Category("Sara UI Design")]
         public Color SkinColor {
             get => skinColor;
             set { skinColor = value; this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el color de la fuente y del icono del calendario.
+        /// </summary>
         [Category("Sara UI Design")]
         public Color TextColor {
             get => textColor;
             set { textColor = value; this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el color del borde decorativo del control.
+        /// </summary>
         [Category("Sara UI Design")]
         public Color BorderColor {
             get => borderColor;
             set { borderColor = value; this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el grosor del borde en píxeles. 
+        /// Use 0 para eliminar el borde.
+        /// </summary>
         [Category("Sara UI Design")]
         public int BorderSize {
             get => borderSize;
             set { borderSize = value; this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el radio de curvatura de las esquinas del control.
+        /// </summary>
         [Category("Sara UI Design")]
         public int BorderRadius {
             get => borderRadius;
             set { borderRadius = value; this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Inicializa una nueva instancia de <see cref="SaraUI_DatePicker"/> activando el dibujo de usuario 
+        /// y definiendo un tamaño y fuente predeterminados para un diseño moderno.
+        /// </summary>
         public SaraUI_DatePicker() {
             this.SetStyle(ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer, true);
             this.MinimumSize = new Size(0, 35);
@@ -53,9 +80,17 @@ namespace Sara_UI_Design.SaraControls {
 
         protected override void OnDropDown(EventArgs eventargs) { base.OnDropDown(eventargs); droppedDown = true; this.Invalidate(); }
         protected override void OnCloseUp(EventArgs eventargs) { base.OnCloseUp(eventargs); droppedDown = false; this.Invalidate(); }
+
+        /// <summary>
+        /// Invalida la entrada por teclado para asegurar que el control funcione solo mediante la selección visual.
+        /// </summary>
         protected override void OnKeyPress(KeyPressEventArgs e) { base.OnKeyPress(e); e.Handled = true; } // Solo lectura en texto
 
-
+        /// <summary>
+        /// Redibuja completamente el control aplicando el fondo redondeado, la cadena de fecha, 
+        /// el icono de calendario desde la librería SaraUI_IconLibrary y el borde opcional.
+        /// </summary>
+        /// <param name="e">Argumentos del evento de dibujo.</param>
         protected override void OnPaint(PaintEventArgs e) {
             Graphics graphics = e.Graphics;
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
@@ -94,6 +129,12 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
+        /// <summary>
+        /// Genera un camino geométrico (<see cref="GraphicsPath"/>) para crear la forma con bordes redondeados.
+        /// </summary>
+        /// <param name="rect">Rectángulo que define el área del control.</param>
+        /// <param name="radius">Radio de los arcos de las esquinas.</param>
+        /// <returns>Un objeto GraphicsPath con la silueta redondeada.</returns>
         private GraphicsPath GetFigurePath(Rectangle rect, int radius) {
             GraphicsPath path = new GraphicsPath();
             float s = radius * 2F;

@@ -11,6 +11,11 @@ using System.ComponentModel;
 using System.Drawing.Design;
 
 namespace Sara_UI_Design.SaraControls {
+
+    /// <summary>
+    /// Control de lista desplegable personalizado de la suite Sara UI. 
+    /// Combina un ComboBox estándar con elementos visuales personalizados para un diseño moderno.
+    /// </summary>
     [DefaultEvent("OnSelectedIndexChanged")]
     public class SaraUI_ComboBox:UserControl {
         //Fields
@@ -27,9 +32,17 @@ namespace Sara_UI_Design.SaraControls {
         private Label lblText;
         private Button btnIcon;
 
-        //Events
+        
+        /// <summary>
+        /// Ocurre cuando el índice de la selección ha cambiado. 
+        /// Este es el evento principal para capturar la interacción del usuario.
+        /// </summary>
         public event EventHandler OnSelectedIndexChanged;//Default event
 
+        /// <summary>
+        /// Inicializa una nueva instancia de <see cref="SaraUI_ComboBox"/>, configurando 
+        /// los sub-controles internos (botón, etiqueta y lista) con el estilo visual inicial.
+        /// </summary>
         public SaraUI_ComboBox() {
             cmbList = new ComboBox();
             lblText = new Label();
@@ -75,7 +88,9 @@ namespace Sara_UI_Design.SaraControls {
             AdjustComboBoxDimensions();
         }
 
-        //Private methods
+        /// <summary>
+        /// Ajusta dinámicamente el tamaño y posición del ComboBox interno para que coincida con el diseño del UserControl.
+        /// </summary>
         private void AdjustComboBoxDimensions() {
             cmbList.Width = lblText.Width;
             cmbList.Location = new Point() {
@@ -143,7 +158,10 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-        [Category("Sara UI Desing")]
+        /// <summary>
+        /// Obtiene o establece el color de la flecha indicadora del menú desplegable.
+        /// </summary>
+        [Category("Sara UI Desingn")]
         public Color IconColor {
             get { return iconColor; }
             set {
@@ -152,7 +170,10 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-        [Category("Sara UI Desing")]
+        /// <summary>
+        /// Obtiene o establece el color de fondo de la lista desplegable (el área de los ítems).
+        /// </summary>
+        [Category("Sara UI Desingn")]
         public Color ListBackColor {
             get { return listBackColor; }
             set {
@@ -161,7 +182,7 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Desingn")]
         public Color ListTextColor {
             get { return listTextColor; }
             set {
@@ -170,7 +191,7 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Desingn")]
         public Color BorderColor {
             get { return borderColor; }
             set {
@@ -179,7 +200,10 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-        [Category("Sara UI Desing")]
+        /// <summary>
+        /// Obtiene o establece el grosor del borde exterior del control.
+        /// </summary>
+        [Category("Sara UI Desingn")]
         public int BorderSize {
             get { return borderSize; }
             set {
@@ -189,7 +213,7 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Desingn")]
         public override Color ForeColor {
             get { return base.ForeColor; }
             set {
@@ -198,7 +222,7 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Desingn")]
         public override Font Font {
             get { return base.Font; }
             set {
@@ -208,13 +232,19 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-        [Category("Sara UI Desing")]
+        /// <summary>
+        /// Obtiene o establece el texto mostrado actualmente en la etiqueta del control.
+        /// </summary>
+        [Category("Sara UI Desingn")]
         public string Texts {
             get { return lblText.Text; }
             set { lblText.Text = value; }
         }
 
-        [Category("Sara UI Desing")]
+        /// <summary>
+        /// Obtiene o establece un valor que especifica el estilo del cuadro combinado (DropDown o DropDownList).
+        /// </summary>
+        [Category("Sara UI Desingn")]
         public ComboBoxStyle DropDownStyle {
             get { return cmbList.DropDownStyle; }
             set {
@@ -223,8 +253,9 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-        //Properties
-        //-> Data
+        /// <summary>
+        /// Obtiene la colección de elementos contenidos en este ComboBox.
+        /// </summary>
         [Category("Sara UI Data")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         [Editor("System.Windows.Forms.Design.ListControlStringCollectionEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
@@ -234,6 +265,9 @@ namespace Sara_UI_Design.SaraControls {
             get { return cmbList.Items; }
         }
 
+        /// <summary>
+        /// Obtiene o establece el origen de datos para el control.
+        /// </summary>
         [Category("Sara UI Data")]
         [AttributeProvider(typeof(IListSource))]
         [DefaultValue(null)]
@@ -280,6 +314,9 @@ namespace Sara_UI_Design.SaraControls {
             set { cmbList.SelectedItem = value; }
         }
 
+        /// <summary>
+        /// Obtiene o establece el índice que especifica el elemento seleccionado actualmente.
+        /// </summary>
         [Category("Sara UI Data")]
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -288,6 +325,9 @@ namespace Sara_UI_Design.SaraControls {
             set { cmbList.SelectedIndex = value; }
         }
 
+        /// <summary>
+        /// Obtiene o establece la propiedad que se va a mostrar para este control.
+        /// </summary>
         [Category("Sara UI Data")]
         [DefaultValue("")]
         [Editor("System.Windows.Forms.Design.DataMemberFieldEditor, System.Design, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
@@ -324,6 +364,9 @@ namespace Sara_UI_Design.SaraControls {
             this.Refresh();
         }
 
+        /// <summary>
+        /// Dibuja mediante vectores la forma de la flecha (V) en el botón lateral del control.
+        /// </summary>
         protected override void OnPaint(PaintEventArgs e) {
             base.OnPaint(e);
             Graphics graph = e.Graphics;

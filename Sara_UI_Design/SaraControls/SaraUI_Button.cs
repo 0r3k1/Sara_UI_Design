@@ -7,6 +7,10 @@ using System.ComponentModel;
 namespace Sara_UI_Design.SaraControls {
     [DefaultEvent("Click")] // define el evento por defecto
 
+    /// <summary>
+    /// Representa un botón personalizado de la suite Sara UI con soporte para bordes redondeados, 
+    /// bordes de color y renderizado de iconos integrados.
+    /// </summary>
     public class SaraUI_Button:Button {
         // Campos privados
         private int borderSize = 0;
@@ -28,13 +32,26 @@ namespace Sara_UI_Design.SaraControls {
         private bool isMouseOver = false;
         private bool isPressed = false;
 
-        // Propiedades con Categoría
+        //// Propiedades con Categoría
+        //[Category("Sara UI Design")]
+        //public int Forecolor {
+        //    get => borderSize;
+        //    set { borderSize = value; Invalidate(); }
+        //}
+
+        /// <summary>
+        /// Obtiene o establece el grosor del borde del botón en píxeles.
+        /// </summary>
         [Category("Sara UI Design")]
         public int BorderSize {
             get => borderSize;
             set { borderSize = value; Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el radio de redondeo de las esquinas. 
+        /// El valor se limita automáticamente a la altura del control para mantener la estética.
+        /// </summary>
         [Category("Sara UI Design")]
         public int BorderRadius {
             get => borderRadius;
@@ -44,12 +61,19 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
+        /// <summary>
+        /// Obtiene o establece el color del borde del botón.
+        /// </summary>
         [Category("Sara UI Design")]
         public Color BorderColor {
             get => borderColor;
             set { borderColor = value; Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el nombre del icono a mostrar. 
+        /// Utiliza "None" para no mostrar ningún icono.
+        /// </summary>
         [Category("Sara UI Design")]
         [TypeConverter(typeof(IconNameConverter))] 
         public string IconName {
@@ -57,30 +81,46 @@ namespace Sara_UI_Design.SaraControls {
             set { iconName = value; Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el tamaño (en píxeles) del icono dentro del botón.
+        /// </summary>
         [Category("Sara UI Design")]
         public int IconSize {
             get => iconSize;
             set { iconSize = value; Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el espacio de separación entre el icono y el texto del botón.
+        /// </summary>
         [Category("Sara UI Design")]
         public int IconPadding {
             get => iconPadding;
             set { iconPadding = value; Invalidate(); }
         }
 
+        /// <summary>
+        /// Define si el icono se posiciona a la izquierda o a la derecha del texto.
+        /// </summary>
         [Category("Sara UI Design")]
         public SaraIconLocation IconLocation {
             get => iconLocation;
             set { iconLocation = value; Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el estilo visual del icono (Contorno o Sólido).
+        /// </summary>
         [Category("Sara UI Design")]
         public SaraUI_IconLibrary.SaraIconStyle IconStyle {
             get => iconStyle;
             set { iconStyle = value; Invalidate(); }
         }
 
+        /// <summary>
+        /// Inicializa una nueva instancia de la clase <see cref="SaraUI_Button"/> 
+        /// con estilos por defecto y doble búfer para evitar parpadeos.
+        /// </summary>
         public SaraUI_Button() {
             this.FlatStyle = FlatStyle.Flat;
             this.FlatAppearance.BorderSize = 0;
@@ -120,6 +160,12 @@ namespace Sara_UI_Design.SaraControls {
             Invalidate();
         }
 
+        /// <summary>
+        /// Genera el camino geométrico para crear los bordes redondeados basándose en un rectángulo y un radio.
+        /// </summary>
+        /// <param name="rect">El área del rectángulo a redondear.</param>
+        /// <param name="radius">El radio de la curvatura.</param>
+        /// <returns>Un objeto <see cref="GraphicsPath"/> con la forma del botón.</returns>
         private GraphicsPath GetFigurePath(Rectangle rect, int radius) {
             GraphicsPath path = new GraphicsPath();
             float curveSize = radius * 2F;
@@ -133,6 +179,10 @@ namespace Sara_UI_Design.SaraControls {
             return path;
         }
 
+        /// <summary>
+        /// Redibuja el control aplicando los efectos de redondeo, bordes, efectos de hover e iconos.
+        /// </summary>
+        /// <param name="pevent">Argumentos del evento de dibujo.</param>
         protected override void OnPaint(PaintEventArgs pevent) {
             Graphics graphics = pevent.Graphics;
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
@@ -188,6 +238,7 @@ namespace Sara_UI_Design.SaraControls {
             int textY = (this.Height - textSize.Height) / 2;
 
             if(hasIcon) {
+                iconColor = ForeColor;
                 if(iconLocation == SaraIconLocation.Left) {
                     // CASO: ICONO IZQUIERDA
                     Rectangle iconRect = new Rectangle(currentX, iconY, iconSize, iconSize);
@@ -209,7 +260,13 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-        // Método de texto actualizado para usar TextRenderer (más nítido y preciso)
+        /// <summary>
+        /// Método auxiliar para renderizar el texto del botón de forma nítida usando TextRenderer.
+        /// </summary>
+        /// <param name="g">Superficie de dibujo.</param>
+        /// <param name="x">Posición horizontal.</param>
+        /// <param name="y">Posición vertical.</param>
+        /// <param name="tSize">Dimensiones medidas del texto.</param>
         private void DrawButtonText(Graphics g, int x, int y, Size tSize) {
             Rectangle textRect = new Rectangle(x, y, tSize.Width, tSize.Height);
             TextRenderer.DrawText(g, this.Text, this.Font, textRect, this.ForeColor, Color.Transparent, TextFormatFlags.Default);

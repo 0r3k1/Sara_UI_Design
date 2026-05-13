@@ -5,6 +5,11 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+	  <Version>1.1.0</Version>
+	  <Authors>CristobalRodas</Authors>
+	  <Description>Biblioteca de controles modernos para WinForms con GridPanel, SideBar y IconLibrary.</Description>
+	  <PackageIcon>logo.png</PackageIcon>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

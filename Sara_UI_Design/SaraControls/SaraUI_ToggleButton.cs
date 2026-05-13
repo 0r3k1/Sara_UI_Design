@@ -5,6 +5,12 @@ using System.Windows.Forms;
 using System.ComponentModel;
 
 namespace Sara_UI_Design.SaraControls {
+
+    /// <summary>
+    /// Representa un interruptor de palanca (Toggle Switch) personalizado de la suite Sara UI. 
+    /// Sustituye la apariencia del CheckBox estándar por una interfaz de deslizamiento 
+    /// con estilos sólidos o de contorno.
+    /// </summary>
     public class SaraUI_ToggleButton:CheckBox {
         // Campos
         private Color onBackColor = Color.MediumSlateBlue;
@@ -14,24 +20,38 @@ namespace Sara_UI_Design.SaraControls {
         private bool solidStyle = true;
 
         // Propiedades
+
+        /// <summary>
+        /// Obtiene o establece el color de fondo del interruptor cuando está en estado activado (Checked).
+        /// </summary>
         [Category("Sara UI Design")]
         public Color OnBackColor {
             get => onBackColor;
             set { onBackColor = value; this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el color del círculo deslizante cuando el interruptor está activado.
+        /// </summary>
         [Category("Sara UI Design")]
         public Color OnToggleColor {
             get => onToggleColor;
             set { onToggleColor = value; this.Invalidate(); }
         }
 
+
+        /// <summary>
+        /// Obtiene o establece el color de fondo del interruptor cuando está en estado desactivado.
+        /// </summary>
         [Category("Sara UI Design")]
         public Color OffBackColor {
             get => offBackColor;
             set { offBackColor = value; this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el color del círculo deslizante cuando el interruptor está desactivado.
+        /// </summary>
         [Category("Sara UI Design")]
         public Color OffToggleColor {
             get => offToggleColor;
@@ -44,6 +64,11 @@ namespace Sara_UI_Design.SaraControls {
             set { }
         }
 
+
+        /// <summary>
+        /// Obtiene o establece si el interruptor se dibuja con un relleno sólido (true) 
+        /// o únicamente con un contorno (false).
+        /// </summary>
         [Category("Sara UI Design")]
         [DefaultValue(true)]
         public bool SolidStyle {
@@ -51,6 +76,11 @@ namespace Sara_UI_Design.SaraControls {
             set { solidStyle = value; this.Invalidate(); }
         }
 
+
+        /// <summary>
+        /// Inicializa una nueva instancia de <see cref="SaraUI_ToggleButton"/> definiendo un tamaño mínimo, 
+        /// el cursor de mano y habilitando el doble búfer para transiciones visuales suaves.
+        /// </summary>
         public SaraUI_ToggleButton() {
             this.MinimumSize = new Size(45, 22);
             this.Cursor = Cursors.Hand;
@@ -61,6 +91,12 @@ namespace Sara_UI_Design.SaraControls {
         }
 
         // Métodos
+
+        /// <summary>
+        /// Genera el trazado geométrico en forma de cápsula para el cuerpo del interruptor, 
+        /// calculando arcos basados en la altura del control.
+        /// </summary>
+        /// <returns>Un objeto <see cref="GraphicsPath"/> con la silueta del control.</returns>
         private GraphicsPath GetFigurePath() {
             int arcSize = this.Height - 1;
             Rectangle leftArc = new Rectangle(0, 0, arcSize, arcSize);

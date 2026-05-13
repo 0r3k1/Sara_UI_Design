@@ -5,6 +5,12 @@ using System.Windows.Forms;
 using System.ComponentModel;
 
 namespace Sara_UI_Design.SaraControls {
+
+    /// <summary>
+    /// Barra de desplazamiento (ScrollBar) personalizada de la suite Sara UI. 
+    /// Permite un control total sobre la estética del canal y el deslizador (thumb), 
+    /// con soporte para orientación vertical y horizontal.
+    /// </summary>
     [DefaultEvent("ValueChanged")]
     public class SaraUI_ScrollBar:Control {
         // Enums
@@ -27,15 +33,30 @@ namespace Sara_UI_Design.SaraControls {
         private Point dragPoint;
 
         // Eventos
+
+        /// <summary>
+        /// Ocurre cuando la propiedad <see cref="Value"/> ha cambiado, ya sea por interacción del usuario o por código.
+        /// </summary>
         public event EventHandler ValueChanged;
 
         // Propiedades de Lógica en Sara UI Design
+
+        /// <summary>
+        /// Obtiene o establece el valor límite inferior del rango de desplazamiento.
+        /// </summary>
         [Category("Sara UI Design Logic")]
         public int Minimum { get => minimum; set { minimum = value; this.Invalidate(); } }
 
+        /// <summary>
+        /// Obtiene o establece el valor límite superior del rango de desplazamiento.
+        /// </summary>
         [Category("Sara UI Design Logic")]
         public int Maximum { get => maximum; set { maximum = value; this.Invalidate(); } }
 
+        /// <summary>
+        /// Obtiene o establece la posición actual del deslizador. 
+        /// El valor se ajusta automáticamente para permanecer dentro del rango definido.
+        /// </summary>
         [Category("Sara UI Design Logic")]
         public int Value {
             get => value;
@@ -46,22 +67,38 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
+        /// <summary>
+        /// Obtiene o establece la cantidad que se suma o resta al valor cuando se hace clic 
+        /// en el canal o se usa para calcular el tamaño proporcional del deslizador.
+        /// </summary>
         [Category("Sara UI Design Logic")]
         public int LargeChange { get => largeChange; set { largeChange = value; this.Invalidate(); } }
 
+        /// <summary>
+        /// Define si la barra de desplazamiento se orienta de forma Vertical u Horizontal. 
+        /// Al cambiarla, el control intercambia automáticamente sus dimensiones de ancho y alto.
+        /// </summary>
         [Category("Sara UI Design Logic")]
         public ScrollOrientation Orientation {
             get => orientation;
             set { orientation = value; this.Size = new Size(this.Height, this.Width); this.Invalidate(); }
         }
 
-        // Propiedades de Diseño en Sara UI Design
+        /// <summary>
+        /// Obtiene o establece el color de fondo del canal por donde se mueve el deslizador.
+        /// </summary>
         [Category("Sara UI Design Appearance")]
         public Color ChannelColor { get => channelColor; set { channelColor = value; this.Invalidate(); } }
 
+        /// <summary>
+        /// Obtiene o establece el color de la pieza móvil (deslizador) de la barra.
+        /// </summary>
         [Category("Sara UI Design Appearance")]
         public Color ThumbColor { get => thumbColor; set { thumbColor = value; this.Invalidate(); } }
 
+        /// <summary>
+        /// Obtiene o establece el radio de redondeo para los extremos del canal y del deslizador.
+        /// </summary>
         [Category("Sara UI Design Appearance")]
         public int BorderRadius { get => borderRadius; set { borderRadius = value; this.Invalidate(); } }
 
@@ -110,6 +147,10 @@ namespace Sara_UI_Design.SaraControls {
         }
 
         // --- Lógica de Dibujo ---
+
+        /// <summary>
+        /// Renderiza los componentes de la barra de desplazamiento: el canal de fondo y el deslizador móvil.
+        /// </summary>
         protected override void OnPaint(PaintEventArgs e) {
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
@@ -133,7 +174,11 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-        // Cálculos matemáticos del Thumb
+        /// <summary>
+        /// Calcula el tamaño (largo o ancho) del deslizador de forma proporcional al rango 
+        /// definido por el <see cref="Maximum"/> y <see cref="LargeChange"/>.
+        /// </summary>
+        /// <returns>Tamaño en píxeles del deslizador.</returns>
         private int GetThumbSize() {
             if(maximum <= minimum)
                 return 0;
@@ -143,6 +188,11 @@ namespace Sara_UI_Design.SaraControls {
             return Math.Max(thumbSize, 20); // Tamaño mínimo de 20px
         }
 
+        /// <summary>
+        /// Calcula la posición y el área rectangular exacta que debe ocupar el deslizador 
+        /// basándose en el valor actual y la orientación.
+        /// </summary>
+        /// <returns>Un objeto <see cref="Rectangle"/> con las coordenadas del deslizador.</returns>
         private Rectangle GetThumbRectangle() {
             int thumbSize = GetThumbSize();
             float ratio = (float)(value - minimum) / (maximum - minimum);
