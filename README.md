@@ -17,6 +17,11 @@ Una biblioteca de controles personalizados para **Windows Forms (.NET)** enfocad
 
 ## 🚀 Instalación
 
+opcion A:
+desde la linea de comandos: dotnet add package Sara_UI_Design --version 1.0.2
+o desde el administrador de paquetes NuGet como Sara_UI_Design
+
+opcion B:
 1. Descarga el repositorio o compila el proyecto para generar el `.dll`.
 2. Agrega la referencia `Sara_UI_Design.dll` a tu proyecto de WinForms.
 3. ¡Arrastra los controles desde tu Cuadro de Herramientas!
