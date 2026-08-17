@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -14,21 +13,15 @@ namespace Sara_UI_Design.SaraControls {
     /// <summary>
     /// Define las posibles posiciones del texto de valor dentro o alrededor de la barra de progreso.
     /// </summary>
-    public enum TextPosition {
-        Left,
-        Right,
-        Center,
-        Sliding,
-        None
-    }
+    public enum TextPosition { Left, Right, Center, Sliding, None }
 
     /// <summary>
     /// Barra de progreso personalizada de Sara UI con soporte para canales y sliders de diferentes alturas, 
     /// bordes redondeados, degradados y visualización de texto dinámica.
     /// </summary>
+    [ToolboxItem(true)]
     public class SaraUI_ProgressBar:ProgressBar {
-        //Fields
-        //-> Appearance
+        // Fields de diseño
         private Color channelColor = Color.LightSteelBlue;
         private Color sliderColor = Color.RoyalBlue;
         private Color foreBackColor = Color.RoyalBlue;
@@ -39,156 +32,129 @@ namespace Sara_UI_Design.SaraControls {
         private string symbolAfter = "";
         private bool showMaximun = false;
 
-        //-> Others
-        private bool paintedBack = false;
         private bool stopPainting = false;
 
+        /// <summary>
+        /// Inicializa una nueva instancia de <see cref="SaraUI_ProgressBar"/> activando los estilos de doble búfer
+        /// y dibujo personalizado por el usuario.
+        /// </summary>
         public SaraUI_ProgressBar() {
             this.SetStyle(ControlStyles.UserPaint |
                           ControlStyles.OptimizedDoubleBuffer |
                           ControlStyles.AllPaintingInWmPaint |
                           ControlStyles.ResizeRedraw, true);
 
-            this.ForeColor = Color.White;
+            this.ForeColor = Color.DimGray; // Cambiado a gris oscuro para mejor contraste inicial
         }
-
-        //Properties
 
         /// <summary>
         /// Obtiene o establece el color de fondo (canal) de la barra de progreso.
         /// </summary>
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Design")]
         public Color ChannelColor {
-            get { return channelColor; }
-            set {
-                channelColor = value;
-                this.Invalidate();
-            }
+            get => channelColor;
+            set { channelColor = value; this.Invalidate(); }
         }
 
         /// <summary>
         /// Obtiene o establece el color principal del indicador de progreso (slider).
         /// </summary>
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Design")]
         public Color SliderColor {
-            get { return sliderColor; }
-            set {
-                sliderColor = value;
-                this.Invalidate();
-            }
-        }
-
-        [Category("Sara UI Desing")]
-        public Color ForeBackColor {
-            get { return foreBackColor; }
-            set {
-                foreBackColor = value;
-                this.Invalidate();
-            }
+            get => sliderColor;
+            set { sliderColor = value; this.Invalidate(); }
         }
 
         /// <summary>
-        /// Determina si el slider debe dibujarse con un degradado lineal entre <see cref="SliderColor"/> y <see cref="SliderColorEnd"/>.
+        /// Determina si el slider debe dibujarse con un degradado lineal continuo.
         /// </summary>
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Design")]
         public bool UseGradient { get; set; } = true;
 
-        [Category("Sara UI Desing")]
-        public Color SliderColorEnd { get; set; } = Color.RoyalBlue;
+        /// <summary>
+        /// Obtiene o establece el color de finalización para el degradado del slider de progreso.
+        /// </summary>
+        [Category("Sara UI Design")]
+        public Color SliderColorEnd { get; set; } = Color.HotPink;
 
         /// <summary>
         /// Obtiene o establece la altura del canal de fondo en píxeles.
         /// </summary>
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Design")]
         public int ChannelHeight {
-            get { return channelHeight; }
-            set {
-                channelHeight = value;
-                this.Invalidate();
-            }
+            get => channelHeight;
+            set { channelHeight = value; this.Invalidate(); }
         }
 
         /// <summary>
-        /// Obtiene o establece la altura del indicador de progreso en píxeles.
+        /// Obtiene o establece la altura del indicador de progreso móvil en píxeles.
         /// </summary>
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Design")]
         public int SliderHeight {
-            get { return sliderHeight; }
-            set {
-                sliderHeight = value;
-                this.Invalidate();
-            }
+            get => sliderHeight;
+            set { sliderHeight = value; this.Invalidate(); }
         }
 
         /// <summary>
         /// Obtiene o establece la posición donde se mostrará el valor porcentual o numérico.
         /// </summary>
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Design")]
         public TextPosition ShowValue {
-            get { return showValue; }
-            set {
-                showValue = value;
-                this.Invalidate();
-            }
+            get => showValue;
+            set { showValue = value; this.Invalidate(); }
         }
 
         /// <summary>
         /// Texto decorativo que se muestra antes del valor numérico (ej. "$").
         /// </summary>
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Design")]
         public string SymbolBefore {
-            get { return symbolBefore; }
-            set {
-                symbolBefore = value;
-                this.Invalidate();
-            }
+            get => symbolBefore;
+            set { symbolBefore = value; this.Invalidate(); }
         }
 
         /// <summary>
-        /// Texto decorativo que se muestra después del valor numérico (ej. "%" o " unidades").
+        /// Texto decorativo que se muestra después del valor numérico (ej. "%" o " kg").
         /// </summary>
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Design")]
         public string SymbolAfter {
-            get { return symbolAfter; }
-            set {
-                symbolAfter = value;
-                this.Invalidate();
-            }
+            get => symbolAfter;
+            set { symbolAfter = value; this.Invalidate(); }
         }
 
         /// <summary>
         /// Si es verdadero, muestra el valor actual junto al valor máximo (ej. "50/100").
         /// </summary>
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Design")]
         public bool ShowMaximun {
-            get { return showMaximun; }
-            set {
-                showMaximun = value;
-                this.Invalidate();
-            }
+            get => showMaximun;
+            set { showMaximun = value; this.Invalidate(); }
         }
 
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Design")]
         [Browsable(true)]
         [EditorBrowsable(EditorBrowsableState.Always)]
         public override Font Font {
-            get { return base.Font; }
-            set {
-                base.Font = value;
-            }
+            get => base.Font;
+            set => base.Font = value;
         }
 
-        [Category("Sara UI Desing")]
+        [Category("Sara UI Design")]
         public override Color ForeColor {
-            get { return base.ForeColor; }
-            set {
-                base.ForeColor = value;
-            }
+            get => base.ForeColor;
+            set => base.ForeColor = value;
         }
 
         private GraphicsPath GetFigurePath(Rectangle rect, int radius) {
             GraphicsPath path = new GraphicsPath();
             float curveSize = radius * 2F;
+            if(curveSize <= 0)
+                curveSize = 1;
+            if(curveSize > rect.Width)
+                curveSize = rect.Width;
+            if(curveSize > rect.Height)
+                curveSize = rect.Height;
+
             path.StartFigure();
             path.AddArc(rect.X, rect.Y, curveSize, curveSize, 180, 90);
             path.AddArc(rect.Right - curveSize, rect.Y, curveSize, curveSize, 270, 90);
@@ -198,45 +164,32 @@ namespace Sara_UI_Design.SaraControls {
             return path;
         }
 
-        //-> Paint the background & channel
         protected override void OnPaintBackground(PaintEventArgs pevent) {
             if(stopPainting)
                 return;
-
             Graphics graph = pevent.Graphics;
-            // Usamos el color del padre para que la transparencia simulada funcione siempre
             graph.Clear(this.Parent?.BackColor ?? Color.White);
-
-            // Dibujamos el canal aquí si quieres mantenerlo separado del slider
-            Rectangle rectChannel = new Rectangle(0, 0, this.Width, channelHeight);
-
-            // Centrar el canal verticalmente
-            rectChannel.Y = (this.Height - channelHeight) / 2;
-
-            using(var brushChannel = new SolidBrush(channelColor)) {
-                graph.FillRectangle(brushChannel, rectChannel);
-            }
         }
 
-        /// <summary>
-        /// Redibuja el control aplicando el diseño redondeado al canal, el slider con degradado (si está activo) 
-        /// y gestiona la llamada para dibujar el texto.
-        /// </summary>
         protected override void OnPaint(PaintEventArgs e) {
             Graphics graph = e.Graphics;
-            graph.SmoothingMode = SmoothingMode.AntiAlias; // Crucial para bordes suaves
+            graph.SmoothingMode = SmoothingMode.AntiAlias;
+            graph.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+
+            // Limpiar fondo para evitar basura visual
+            graph.Clear(this.Parent?.BackColor ?? Color.White);
 
             double scaleFactor = (((double)this.Value - this.Minimum) / ((double)this.Maximum - this.Minimum));
             int sliderWidth = (int)(this.Width * scaleFactor);
 
-            // Dibujar Canal Redondeado
+            // 1. Dibujar Canal Redondeado Suave
             Rectangle rectChannel = new Rectangle(0, (this.Height - channelHeight) / 2, this.Width, channelHeight);
             using(GraphicsPath pathChannel = GetFigurePath(rectChannel, channelHeight / 2))
             using(SolidBrush brushChannel = new SolidBrush(channelColor)) {
                 graph.FillPath(brushChannel, pathChannel);
             }
 
-            // Dibujar Slider Redondeado con Degradado
+            // 2. Dibujar Slider Redondeado Fluido
             if(sliderWidth > 1) {
                 Rectangle rectSlider = new Rectangle(0, (this.Height - sliderHeight) / 2, sliderWidth, sliderHeight);
                 using(GraphicsPath pathSlider = GetFigurePath(rectSlider, sliderHeight / 2)) {
@@ -250,63 +203,42 @@ namespace Sara_UI_Design.SaraControls {
                 }
             }
 
+            // 3. Renderizar Texto
             if(showValue != TextPosition.None)
-                DrawValueText(graph, sliderWidth, new Rectangle(0, 0, this.Width, this.Height));
+                DrawValueText(graph, sliderWidth);
         }
 
-        /// <summary>
-        /// Calcula la posición y renderiza el texto informativo del progreso basándose en la alineación seleccionada.
-        /// </summary>
-        /// <param name="graph">Superficie de dibujo.</param>
-        /// <param name="sliderWidth">Ancho actual del indicador de progreso.</param>
-        /// <param name="rectSlider">Rectángulo que define el área total del control.</param>
-        private void DrawValueText(Graphics graph, int sliderWidth, Rectangle rectSlider) {
-            //Fields
+        private void DrawValueText(Graphics graph, int sliderWidth) {
             string text = symbolBefore + this.Value.ToString() + symbolAfter;
             if(showMaximun)
                 text = text + "/" + symbolBefore + this.Maximum.ToString() + symbolAfter;
-            var textSize = TextRenderer.MeasureText(text, this.Font);
-            var rectText = new Rectangle(0, 0, textSize.Width, textSize.Height + 2);
-            using(var brushText = new SolidBrush(this.ForeColor))
-            using(var brushTextBack = new SolidBrush(foreBackColor))
-            using(var textFormat = new StringFormat()) {
-                switch(showValue) {
-                    case TextPosition.Left:
-                    rectText.X = 0;
-                    textFormat.Alignment = StringAlignment.Near;
-                    break;
 
-                    case TextPosition.Right:
-                    rectText.X = this.Width - textSize.Width;
-                    textFormat.Alignment = StringAlignment.Far;
-                    break;
+            Size textSize = TextRenderer.MeasureText(text, this.Font);
+            Rectangle rectText = new Rectangle(0, (this.Height - textSize.Height) / 2, textSize.Width, textSize.Height);
 
-                    case TextPosition.Center:
-                    rectText.X = (this.Width - textSize.Width) / 2;
-                    textFormat.Alignment = StringAlignment.Center;
-                    break;
-
-                    case TextPosition.Sliding:
-                    rectText.X = sliderWidth - textSize.Width;
-                    textFormat.Alignment = StringAlignment.Center;
-                    //Clean previous text surface
-                    using(var brushClear = new SolidBrush(this.Parent.BackColor)) {
-                        var rect = rectSlider;
-                        rect.Y = rectText.Y;
-                        rect.Height = rectText.Height;
-                        graph.FillRectangle(brushClear, rect);
-                    }
-                    break;
-                }
-                //Painting
-                graph.FillRectangle(brushTextBack, rectText);
-                graph.DrawString(text, this.Font, brushText, rectText, textFormat);
+            switch(showValue) {
+                case TextPosition.Left:
+                rectText.X = 4;
+                break;
+                case TextPosition.Right:
+                rectText.X = this.Width - textSize.Width - 4;
+                break;
+                case TextPosition.Center:
+                rectText.X = (this.Width - textSize.Width) / 2;
+                break;
+                case TextPosition.Sliding:
+                // Control matemático para evitar que el texto se salga por la izquierda al iniciar
+                rectText.X = Math.Max(4, sliderWidth - textSize.Width - 4);
+                break;
             }
+
+            // CORRECCIÓN SARA UI: El texto ahora flota de forma plana y transparente, eliminando el recuadro rígido
+            TextRenderer.DrawText(graph, text, this.Font, rectText, this.ForeColor, Color.Transparent, TextFormatFlags.VerticalCenter);
         }
 
         protected override void OnParentBackColorChanged(EventArgs e) {
             base.OnParentBackColorChanged(e);
-            this.Invalidate(); // Fuerza al control a redibujarse completamente
+            this.Invalidate();
         }
     }
 }

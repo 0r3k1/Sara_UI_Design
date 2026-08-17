@@ -3,26 +3,26 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using static Sara_UI_Design.SaraControls.SaraUI_TextBox;
 
 namespace Sara_UI_Design.SaraControls {
 
     /// <summary>
     /// Control de entrada de texto avanzado de la suite Sara UI. 
     /// Soporta estilos subrayados o redondeados, placeholders, validación de tipos de entrada, 
-    /// iconos integrados y efectos visuales de enfoque.
+    /// iconos integrados de la IconLibrary y efectos visuales de enfoque.
     /// </summary>
     [DefaultEvent("_TextChanged")]
     public partial class SaraUI_TextBox:UserControl {
-
-        // Enums para personalización
 
         /// <summary>
         /// Define el comportamiento del cuadro de texto según el tipo de datos esperado.
         /// </summary>
         public enum InputType { Text, Password, Numeric, Multiline }
+
+        /// <summary>
+        /// Define la ubicación del icono dentro del control.
+        /// </summary>
         public enum SaraIconLocation { Left, Right }
 
         // Fields de diseño
@@ -39,15 +39,12 @@ namespace Sara_UI_Design.SaraControls {
         private Color placeholderColor = Color.Gray;
         private Color mainForeColor = Color.Black;
         private InputType inputType = InputType.Text;
-        private InputType type = InputType.Text;
 
         // Fields de Icono
         private string iconName = "None";
         private Color iconColor = Color.Gray;
         private int iconSize = 20;
         private SaraIconLocation iconLocation = SaraIconLocation.Left;
-
-        // Eventos
 
         /// <summary>
         /// Ocurre cuando el contenido de texto dentro del control cambia.
@@ -56,13 +53,16 @@ namespace Sara_UI_Design.SaraControls {
 
         /// <summary>
         /// Inicializa una nueva instancia de <see cref="SaraUI_TextBox"/> configurando 
-        /// los eventos del control interno y el espaciado predeterminado.
+        /// los eventos del control interno, la sincronización de estilos y el espaciado dinámico.
         /// </summary>
         public SaraUI_TextBox() {
             InitializeComponent();
             this.mainForeColor = this.ForeColor;
             ConfigureTextBoxEvents();
-            this.Padding = new Padding(10, 7, 10, 7); // Padding base
+
+            // Forzar configuraciones e hilos iniciales críticos
+            ApplyInputType();
+            UpdatePadding();
         }
 
         private void ConfigureTextBoxEvents() {
@@ -73,9 +73,73 @@ namespace Sara_UI_Design.SaraControls {
             textBox1.Click += (s, e) => this.OnClick(e);
         }
 
+        /// <summary>
+        /// Obtiene o establece el texto actual del control. Si el placeholder está activo, devuelve un valor vacío.
+        /// </summary>
+        [Category("Sara UI Design")]
+        [Browsable(true)]
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public override string Text {
+            get {
+                return isPlaceholder ? string.Empty : textBox1.Text;
+            }
+            set {
+                if(string.IsNullOrEmpty(value)) {
+                    textBox1.Text = "";
+                    SetPlaceholder();
+                } else {
+                    isPlaceholder = false;
+                    textBox1.ForeColor = mainForeColor;
+                    textBox1.Text = value;
+                    if(inputType == InputType.Password)
+                        textBox1.UseSystemPasswordChar = true;
+                }
+                this.Invalidate();
+            }
+        }
 
         /// <summary>
-        /// Obtiene o establece el nombre del icono a mostrar. Use "None" para ocultarlo.
+        /// Obtiene o establece el color de fondo del control y sincroniza el cuadro de texto interno.
+        /// </summary>
+        [Category("Sara UI Design")]
+        public override Color BackColor {
+            get => base.BackColor;
+            set {
+                base.BackColor = value;
+                if(textBox1 != null)
+                    textBox1.BackColor = value;
+                this.Invalidate();
+            }
+        }
+
+        protected override void OnBackColorChanged(EventArgs e) {
+            base.OnBackColorChanged(e);
+            if(textBox1 != null)
+                textBox1.BackColor = this.BackColor;
+            this.Invalidate();
+        }
+
+        protected override void OnForeColorChanged(EventArgs e) {
+            base.OnForeColorChanged(e);
+            mainForeColor = this.ForeColor;
+            if(!isPlaceholder && textBox1 != null)
+                textBox1.ForeColor = this.ForeColor;
+        }
+
+        protected override void OnFontChanged(EventArgs e) {
+            base.OnFontChanged(e);
+            if(textBox1 != null)
+                textBox1.Font = this.Font;
+            UpdateControlHeight();
+        }
+
+        // ==========================================
+        // PROPIEDADES SARA UI DESIGN
+        // ==========================================
+
+        /// <summary>
+        /// Obtiene o establece el nombre del icono a mostrar desde la biblioteca compartida. Use "None" para ocultarlo.
         /// </summary>
         [Category("Sara UI Design")]
         [TypeConverter(typeof(IconNameConverter))]
@@ -84,12 +148,17 @@ namespace Sara_UI_Design.SaraControls {
             set { iconName = value; UpdatePadding(); this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el color base del icono gráfico.
+        /// </summary>
         [Category("Sara UI Design")]
         public Color IconColor { get => iconColor; set { iconColor = value; this.Invalidate(); } }
 
+        /// <summary>
+        /// Obtiene o establece el tamaño en píxeles del icono (ancho y alto proporcional).
+        /// </summary>
         [Category("Sara UI Design")]
         public int IconSize { get => iconSize; set { iconSize = value; UpdatePadding(); this.Invalidate(); } }
-
 
         /// <summary>
         /// Define si el icono se posiciona al inicio (izquierda) o al final (derecha) del texto.
@@ -97,12 +166,13 @@ namespace Sara_UI_Design.SaraControls {
         [Category("Sara UI Design")]
         public SaraIconLocation IconLocation { get => iconLocation; set { iconLocation = value; UpdatePadding(); this.Invalidate(); } }
 
-        // --- Propiedades de Diseño (RESTAURADAS) ---
-
+        /// <summary>
+        /// Obtiene o establece el grosor del borde perimetral del control.
+        /// </summary>
         [Category("Sara UI Design")]
         public int BorderSize {
             get => borderSize;
-            set { borderSize = value; this.Padding = new Padding(borderSize + 5); this.Invalidate(); }
+            set { borderSize = value; UpdatePadding(); this.Invalidate(); }
         }
 
         /// <summary>
@@ -110,14 +180,13 @@ namespace Sara_UI_Design.SaraControls {
         /// </summary>
         [Category("Sara UI Design")]
         public InputType Type {
-            get { return inputType; }
-            set {
-                inputType = value;
-                ApplyInputType(); // Llamamos al nuevo método unificado
-                this.Invalidate();
-            }
+            get => inputType;
+            set { inputType = value; ApplyInputType(); this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el color del texto indicativo o placeholder.
+        /// </summary>
         [Category("Sara UI Design")]
         public Color PlaceholderColor {
             get => placeholderColor;
@@ -133,18 +202,27 @@ namespace Sara_UI_Design.SaraControls {
             set { placeholderText = value; SetPlaceholder(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el radio de curvatura para los bordes redondeados del control.
+        /// </summary>
         [Category("Sara UI Design")]
         public int BorderRadius {
             get => borderRadius;
             set { borderRadius = (value >= 0) ? value : 0; this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el color base del borde cuando el control está en estado pasivo o en reposo.
+        /// </summary>
         [Category("Sara UI Design")]
         public Color BorderColor {
             get => borderColor;
             set { borderColor = value; this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el color del borde cuando el control gana el foco de entrada del teclado.
+        /// </summary>
         [Category("Sara UI Design")]
         public Color BorderFocusColor {
             get => borderFocusColor;
@@ -152,7 +230,7 @@ namespace Sara_UI_Design.SaraControls {
         }
 
         /// <summary>
-        /// Si es verdadero, el control muestra únicamente una línea inferior en lugar de un borde completo.
+        /// Si es verdadero, el control muestra únicamente una línea inferior en lugar de un borde completo perimetral.
         /// </summary>
         [Category("Sara UI Design")]
         public bool UnderlinedStyle {
@@ -160,15 +238,15 @@ namespace Sara_UI_Design.SaraControls {
             set { underlinedStyle = value; this.Invalidate(); }
         }
 
-        // --- Lógica de Validación y Tipos de Entrada ---
+        // ==========================================
+        // LÓGICA DE PROCESAMIENTO Y VALIDACIONES
+        // ==========================================
 
         private void ApplyInputType() {
-            // Usamos 'inputType' para ser consistentes con tu declaración de campo
             switch(inputType) {
                 case InputType.Multiline:
                 textBox1.Multiline = true;
                 textBox1.UseSystemPasswordChar = false;
-                // No llamamos a UpdateControlHeight para que el usuario pueda estirarlo
                 break;
 
                 case InputType.Password:
@@ -187,14 +265,11 @@ namespace Sara_UI_Design.SaraControls {
         }
 
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e) {
-            // Cambiado 'type' por 'inputType'
             if(inputType == InputType.Numeric && !char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar)) {
                 e.Handled = true;
             }
             this.OnKeyPress(e);
         }
-
-        // --- Lógica del Placeholder ---
 
         /// <summary>
         /// Activa el modo Placeholder si el control está vacío, aplicando el color y texto informativo.
@@ -205,7 +280,6 @@ namespace Sara_UI_Design.SaraControls {
                 textBox1.Text = placeholderText;
                 textBox1.ForeColor = placeholderColor;
 
-                // Si es contraseña, quitamos los puntos para que se lea el mensaje (ej: "Contraseña")
                 if(inputType == InputType.Password)
                     textBox1.UseSystemPasswordChar = false;
             }
@@ -225,25 +299,30 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
+        /// <summary>
+        /// Calcula el margen interno óptimo del control en tiempo real sumando los grosores de bordes y gráficos activos.
+        /// </summary>
         private void UpdatePadding() {
-            // Si hay icono, aumentamos el padding del lado correspondiente para que el texto no lo tape
-            int left = 10;
-            int right = 10;
+            int left = borderSize + 6;
+            int right = borderSize + 6;
+            int top = borderSize + 5;
+            int bottom = borderSize + 5;
+
             bool hasIcon = !string.IsNullOrEmpty(iconName) && iconName != "None";
 
             if(hasIcon) {
                 if(iconLocation == SaraIconLocation.Left)
-                    left = iconSize + 15;
+                    left += iconSize + 8;
                 else
-                    right = iconSize + 15;
+                    right += iconSize + 8;
             }
 
-            this.Padding = new Padding(left, 7, right, 7);
+            this.Padding = new Padding(left, top, right, bottom);
         }
 
         /// <summary>
         /// Gestiona el dibujo del borde, la región redondeada y la renderización del icono 
-        /// con efectos de color cuando el control tiene el foco.
+        /// con efectos de color reactivos cuando el control tiene el foco.
         /// </summary>
         protected override void OnPaint(PaintEventArgs e) {
             base.OnPaint(e);
@@ -271,13 +350,12 @@ namespace Sara_UI_Design.SaraControls {
                 }
             }
 
-            // 2. Dibujar el Icono de la IconLibrary
+            // 2. Dibujar el Icono desde la IconLibrary de forma dinámica
             if(!string.IsNullOrEmpty(iconName) && iconName != "None") {
-                int iconX = (iconLocation == SaraIconLocation.Left) ? 10 : this.Width - iconSize - 10;
+                int iconX = (iconLocation == SaraIconLocation.Left) ? 12 : this.Width - iconSize - 12;
                 int iconY = (this.Height - iconSize) / 2;
                 Rectangle iconRect = new Rectangle(iconX, iconY, iconSize, iconSize);
 
-                // El icono brilla con el color de foco si está seleccionado
                 Color currentIconColor = isFocused ? borderFocusColor : iconColor;
                 SaraUI_IconLibrary.DrawIcon(iconName, g, iconRect, currentIconColor);
             }
@@ -300,22 +378,15 @@ namespace Sara_UI_Design.SaraControls {
         /// siempre que no se encuentre en modo multilínea.
         /// </summary>
         private void UpdateControlHeight() {
-            // Si el TextBox interno es multilínea, NO debemos forzar la altura del UserControl
             if(textBox1.Multiline == false) {
                 int txtHeight = TextRenderer.MeasureText("Text", this.Font).Height + 1;
-
-                // Establecemos una altura mínima para que el control no desaparezca
                 textBox1.MinimumSize = new Size(0, txtHeight);
-
-                // La altura del UserControl será la del texto + el padding (superior e inferior)
                 this.Height = textBox1.Height + this.Padding.Top + this.Padding.Bottom;
             }
         }
 
         protected override void OnResize(EventArgs e) {
             base.OnResize(e);
-            // Solo forzamos la altura si NO es multilínea. 
-            // Si es multilínea, dejamos que el usuario lo estire libremente.
             if(this.DesignMode && inputType != InputType.Multiline) {
                 UpdateControlHeight();
             }

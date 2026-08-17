@@ -7,13 +7,11 @@ using System.ComponentModel;
 namespace Sara_UI_Design.SaraControls {
 
     /// <summary>
-    /// Barra de desplazamiento (ScrollBar) personalizada de la suite Sara UI. 
-    /// Permite un control total sobre la estética del canal y el deslizador (thumb), 
-    /// con soporte para orientación vertical y horizontal.
+    /// Barra de desplazamiento (ScrollBar) personalizada de la suite Sara UI con control preciso de arrastre matemático.
     /// </summary>
     [DefaultEvent("ValueChanged")]
     public class SaraUI_ScrollBar:Control {
-        // Enums
+
         public enum ScrollOrientation { Horizontal, Vertical }
 
         // Fields de Lógica
@@ -28,115 +26,90 @@ namespace Sara_UI_Design.SaraControls {
         private Color thumbColor = Color.MediumSlateBlue;
         private int borderRadius = 5;
 
-        // Estado del mouse
         private bool isDragging = false;
-        private Point dragPoint;
+        private int dragOffset = 0; // Guardar el punto exacto de presión interna en el Thumb
 
-        // Eventos
-
-        /// <summary>
-        /// Ocurre cuando la propiedad <see cref="Value"/> ha cambiado, ya sea por interacción del usuario o por código.
-        /// </summary>
         public event EventHandler ValueChanged;
 
-        // Propiedades de Lógica en Sara UI Design
-
-        /// <summary>
-        /// Obtiene o establece el valor límite inferior del rango de desplazamiento.
-        /// </summary>
         [Category("Sara UI Design Logic")]
         public int Minimum { get => minimum; set { minimum = value; this.Invalidate(); } }
 
-        /// <summary>
-        /// Obtiene o establece el valor límite superior del rango de desplazamiento.
-        /// </summary>
         [Category("Sara UI Design Logic")]
         public int Maximum { get => maximum; set { maximum = value; this.Invalidate(); } }
 
-        /// <summary>
-        /// Obtiene o establece la posición actual del deslizador. 
-        /// El valor se ajusta automáticamente para permanecer dentro del rango definido.
-        /// </summary>
         [Category("Sara UI Design Logic")]
         public int Value {
             get => value;
             set {
-                this.value = Math.Max(minimum, Math.Min(maximum, value));
-                ValueChanged?.Invoke(this, EventArgs.Empty);
+                int newValue = Math.Max(minimum, Math.Min(maximum, value));
+                if(this.value != newValue) {
+                    this.value = newValue;
+                    ValueChanged?.Invoke(this, EventArgs.Empty);
+                    this.Invalidate();
+                }
+            }
+        }
+
+        [Category("Sara UI Design Logic")]
+        public int LargeChange { get => largeChange; set { largeChange = value; this.Invalidate(); } }
+
+        [Category("Sara UI Design Logic")]
+        public ScrollOrientation Orientation {
+            get => orientation;
+            set {
+                orientation = value;
+                this.Size = new Size(this.Height, this.Width);
                 this.Invalidate();
             }
         }
 
-        /// <summary>
-        /// Obtiene o establece la cantidad que se suma o resta al valor cuando se hace clic 
-        /// en el canal o se usa para calcular el tamaño proporcional del deslizador.
-        /// </summary>
-        [Category("Sara UI Design Logic")]
-        public int LargeChange { get => largeChange; set { largeChange = value; this.Invalidate(); } }
-
-        /// <summary>
-        /// Define si la barra de desplazamiento se orienta de forma Vertical u Horizontal. 
-        /// Al cambiarla, el control intercambia automáticamente sus dimensiones de ancho y alto.
-        /// </summary>
-        [Category("Sara UI Design Logic")]
-        public ScrollOrientation Orientation {
-            get => orientation;
-            set { orientation = value; this.Size = new Size(this.Height, this.Width); this.Invalidate(); }
-        }
-
-        /// <summary>
-        /// Obtiene o establece el color de fondo del canal por donde se mueve el deslizador.
-        /// </summary>
         [Category("Sara UI Design Appearance")]
         public Color ChannelColor { get => channelColor; set { channelColor = value; this.Invalidate(); } }
 
-        /// <summary>
-        /// Obtiene o establece el color de la pieza móvil (deslizador) de la barra.
-        /// </summary>
         [Category("Sara UI Design Appearance")]
         public Color ThumbColor { get => thumbColor; set { thumbColor = value; this.Invalidate(); } }
 
-        /// <summary>
-        /// Obtiene o establece el radio de redondeo para los extremos del canal y del deslizador.
-        /// </summary>
         [Category("Sara UI Design Appearance")]
         public int BorderRadius { get => borderRadius; set { borderRadius = value; this.Invalidate(); } }
 
         public SaraUI_ScrollBar() {
             this.SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer, true);
-            this.Size = new Size(10, 150); // Tamaño inicial por defecto
+            this.Size = new Size(10, 150);
             this.BackColor = Color.White;
         }
 
-        // --- Lógica del Mouse ---
         protected override void OnMouseDown(MouseEventArgs e) {
             base.OnMouseDown(e);
             Rectangle thumbRect = GetThumbRectangle();
             if(thumbRect.Contains(e.Location)) {
                 isDragging = true;
-                dragPoint = e.Location;
+                // Guardamos la distancia exacta desde el borde del thumb al clic para un movimiento natural
+                dragOffset = (orientation == ScrollOrientation.Vertical) ? e.Y - thumbRect.Y : e.X - thumbRect.X;
             }
         }
 
         protected override void OnMouseMove(MouseEventArgs e) {
             base.OnMouseMove(e);
             if(isDragging) {
-                float totalSpace = maximum - minimum;
+                int totalSpace = maximum - minimum;
                 if(totalSpace <= 0)
                     return;
 
+                // REFACTORIZACIÓN MATEMÁTICA: Arrastre absoluto sin saltos ni desbordamientos por delta
                 if(orientation == ScrollOrientation.Vertical) {
-                    float availableHeight = this.Height - GetThumbSize();
-                    int deltaY = e.Y - dragPoint.Y;
-                    float percentShift = deltaY / availableHeight;
-                    Value += (int)(percentShift * totalSpace);
-                    dragPoint = e.Location; // Actualizar punto de arrastre
+                    int availableHeight = this.Height - GetThumbSize();
+                    if(availableHeight > 0) {
+                        int trackY = e.Y - dragOffset;
+                        float ratio = (float)trackY / availableHeight;
+                        Value = minimum + (int)(ratio * totalSpace);
+                    }
                 } else {
-                    float availableWidth = this.Width - GetThumbSize();
-                    int deltaX = e.X - dragPoint.X;
-                    float percentShift = deltaX / availableWidth;
-                    Value += (int)(percentShift * totalSpace);
-                    dragPoint = e.Location; // Actualizar punto de arrastre
+                    int availableWidth = this.Width - GetThumbSize();
+                    if(availableWidth > 0) {
+                        int trackX = e.X - dragOffset;
+                        float ratio = (float)trackX / availableWidth;
+                        Value = minimum + (int)(ratio * totalSpace);
+                    }
                 }
             }
         }
@@ -146,11 +119,6 @@ namespace Sara_UI_Design.SaraControls {
             isDragging = false;
         }
 
-        // --- Lógica de Dibujo ---
-
-        /// <summary>
-        /// Renderiza los componentes de la barra de desplazamiento: el canal de fondo y el deslizador móvil.
-        /// </summary>
         protected override void OnPaint(PaintEventArgs e) {
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
@@ -158,13 +126,11 @@ namespace Sara_UI_Design.SaraControls {
 
             Rectangle rectClient = this.ClientRectangle;
 
-            // 1. Dibujar Canal (Fondo del scroll)
             using(GraphicsPath pathChannel = GetFigurePath(rectClient, borderRadius))
             using(SolidBrush brushChannel = new SolidBrush(channelColor)) {
                 g.FillPath(brushChannel, pathChannel);
             }
 
-            // 2. Dibujar el Thumb (El deslizador)
             if(maximum > minimum) {
                 Rectangle thumbRect = GetThumbRectangle();
                 using(GraphicsPath pathThumb = GetFigurePath(thumbRect, borderRadius - 1))
@@ -174,28 +140,18 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-        /// <summary>
-        /// Calcula el tamaño (largo o ancho) del deslizador de forma proporcional al rango 
-        /// definido por el <see cref="Maximum"/> y <see cref="LargeChange"/>.
-        /// </summary>
-        /// <returns>Tamaño en píxeles del deslizador.</returns>
         private int GetThumbSize() {
             if(maximum <= minimum)
                 return 0;
             float ratio = (float)largeChange / (maximum - minimum + largeChange);
             int size = (orientation == ScrollOrientation.Vertical ? this.Height : this.Width);
             int thumbSize = (int)(size * ratio);
-            return Math.Max(thumbSize, 20); // Tamaño mínimo de 20px
+            return Math.Max(thumbSize, 20);
         }
 
-        /// <summary>
-        /// Calcula la posición y el área rectangular exacta que debe ocupar el deslizador 
-        /// basándose en el valor actual y la orientación.
-        /// </summary>
-        /// <returns>Un objeto <see cref="Rectangle"/> con las coordenadas del deslizador.</returns>
         private Rectangle GetThumbRectangle() {
             int thumbSize = GetThumbSize();
-            float ratio = (float)(value - minimum) / (maximum - minimum);
+            float ratio = (maximum > minimum) ? (float)(value - minimum) / (maximum - minimum) : 0;
 
             if(orientation == ScrollOrientation.Vertical) {
                 int availableHeight = this.Height - thumbSize;

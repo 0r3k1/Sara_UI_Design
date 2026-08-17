@@ -8,19 +8,17 @@ namespace Sara_UI_Design.SaraControls {
 
     /// <summary>
     /// Selector de fecha personalizado de la suite Sara UI con soporte para esquinas redondeadas, 
-    /// personalización de colores de fondo y bordes, e integración de iconos vectoriales.
+    /// personalización de colores de fondo y bordes, e integración de iconos vectoriales dinámicos.
     /// </summary>
+    [ToolboxItem(true)]
     public class SaraUI_DatePicker:DateTimePicker {
         // Fields
         private Color skinColor = Color.MediumSlateBlue;
         private Color textColor = Color.White;
         private Color borderColor = Color.PaleVioletRed;
         private int borderSize = 0;
-        private int borderRadius = 10;
+        private int borderRadius = 12; // Subido a 12 para un acabado más suave y moderno
         private bool droppedDown = false;
-
-
-        // Propiedades en Sara UI Design
 
         /// <summary>
         /// Obtiene o establece el color de fondo principal del control.
@@ -50,8 +48,7 @@ namespace Sara_UI_Design.SaraControls {
         }
 
         /// <summary>
-        /// Obtiene o establece el grosor del borde en píxeles. 
-        /// Use 0 para eliminar el borde.
+        /// Obtiene o establece el grosor del borde en píxeles. Use 0 para eliminar el borde.
         /// </summary>
         [Category("Sara UI Design")]
         public int BorderSize {
@@ -84,19 +81,18 @@ namespace Sara_UI_Design.SaraControls {
         /// <summary>
         /// Invalida la entrada por teclado para asegurar que el control funcione solo mediante la selección visual.
         /// </summary>
-        protected override void OnKeyPress(KeyPressEventArgs e) { base.OnKeyPress(e); e.Handled = true; } // Solo lectura en texto
+        protected override void OnKeyPress(KeyPressEventArgs e) { base.OnKeyPress(e); e.Handled = true; }
 
         /// <summary>
         /// Redibuja completamente el control aplicando el fondo redondeado, la cadena de fecha, 
-        /// el icono de calendario desde la librería SaraUI_IconLibrary y el borde opcional.
+        /// el icono de calendario desde la librería dinámica de SaraUI y el borde opcional.
         /// </summary>
-        /// <param name="e">Argumentos del evento de dibujo.</param>
         protected override void OnPaint(PaintEventArgs e) {
             Graphics graphics = e.Graphics;
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
-            // En lugar de transparencia, pintamos el fondo con el color del padre 
-            // para que las esquinas redondeadas se vean bien
+            // Evitamos imperfecciones pintando el fondo exterior con el color del contenedor padre
             graphics.Clear(this.Parent?.BackColor ?? Color.White);
 
             Rectangle rectClient = this.ClientRectangle;
@@ -108,18 +104,19 @@ namespace Sara_UI_Design.SaraControls {
                 }
             }
 
-            // 2. Dibujar Texto
+            // 2. Dibujar Texto Dinámico (Ajuste de margen inteligente basado en el radio)
+            int textLeftPadding = Math.Max(12, borderRadius / 2 + 6);
             using(SolidBrush brushText = new SolidBrush(textColor))
             using(StringFormat sf = new StringFormat { LineAlignment = StringAlignment.Center }) {
-                graphics.DrawString("   " + this.Text, this.Font, brushText,
-                                   new Rectangle(10, 0, this.Width - 40, this.Height), sf);
+                Rectangle textRect = new Rectangle(textLeftPadding, 0, this.Width - (textLeftPadding + 35), this.Height);
+                graphics.DrawString(this.Text, this.Font, brushText, textRect, sf);
             }
 
-            // 3. USAR LIBRERÍA DE ICONOS
-            Rectangle iconRect = new Rectangle(this.Width - 30, (this.Height - 20) / 2, 20, 20);
-            SaraUI_IconLibrary.DrawCalendar(graphics, iconRect, textColor);
+            // 3. LLAMADA INTEGRADA A TU NUEVA ICONLIBRARY
+            Rectangle iconRect = new Rectangle(this.Width - 28, (this.Height - 16) / 2, 16, 16);
+            SaraUI_IconLibrary.DrawIcon("Calendar", graphics, iconRect, textColor);
 
-            // 4. Borde (si aplica)
+            // 4. Borde Vectorial Inteligente
             if(borderSize > 0) {
                 using(Pen penBorder = new Pen(borderColor, borderSize)) {
                     penBorder.Alignment = PenAlignment.Inset;
@@ -129,15 +126,16 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-        /// <summary>
-        /// Genera un camino geométrico (<see cref="GraphicsPath"/>) para crear la forma con bordes redondeados.
-        /// </summary>
-        /// <param name="rect">Rectángulo que define el área del control.</param>
-        /// <param name="radius">Radio de los arcos de las esquinas.</param>
-        /// <returns>Un objeto GraphicsPath con la silueta redondeada.</returns>
         private GraphicsPath GetFigurePath(Rectangle rect, int radius) {
             GraphicsPath path = new GraphicsPath();
             float s = radius * 2F;
+            if(s <= 0)
+                s = 1;
+            if(s > rect.Width)
+                s = rect.Width;
+            if(s > rect.Height)
+                s = rect.Height;
+
             path.AddArc(rect.X, rect.Y, s, s, 180, 90);
             path.AddArc(rect.Right - s, rect.Y, s, s, 270, 90);
             path.AddArc(rect.Right - s, rect.Bottom - s, s, s, 0, 90);

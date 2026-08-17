@@ -10,11 +10,11 @@ namespace Sara_UI_Design.SaraControls {
     /// Representa un botón de opción (RadioButton) personalizado de la suite Sara UI con estilos modernos 
     /// y soporte para colores personalizados en estados marcados, no marcados y al pasar el ratón.
     /// </summary>
+    [ToolboxItem(true)]
     public class SaraUI_RadioButton:RadioButton {
         private Color checkedColor = Color.MediumSlateBlue;
         private Color unCheckedColor = Color.Gray;
         private bool isHovering = false;
-
 
         /// <summary>
         /// Obtiene o establece el color del círculo interno y del borde cuando el control está seleccionado (Checked).
@@ -37,41 +37,44 @@ namespace Sara_UI_Design.SaraControls {
             this.Padding = new Padding(10, 0, 0, 0);
             this.Cursor = Cursors.Hand;
 
-            this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            this.SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor, true);
         }
 
-        /// <summary>
-        /// Activa el estado de resaltado (Hover) para cambiar visualmente el color del borde.
-        /// </summary>
         protected override void OnMouseEnter(EventArgs e) { base.OnMouseEnter(e); isHovering = true; Invalidate(); }
         protected override void OnMouseLeave(EventArgs e) { base.OnMouseLeave(e); isHovering = false; Invalidate(); }
 
         /// <summary>
         /// Redibuja completamente el control, calculando las áreas para el círculo exterior, 
-        /// el círculo de selección interno y el texto alineado.
+        /// el círculo de selección interno y el texto alineado de forma nítida.
         /// </summary>
-        /// <param name="pevent">Argumentos del evento de dibujo.</param>
         protected override void OnPaint(PaintEventArgs pevent) {
             Graphics graphics = pevent.Graphics;
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            graphics.Clear(this.BackColor);
+            graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+
+            // CORRECCIÓN BUG FONDO: Limpieza basada en el contenedor padre para evitar el recuadro gris
+            graphics.Clear(this.Parent?.BackColor ?? Color.White);
 
             float rbSize = 18F;
             float checkSize = 10F;
-            RectangleF rectBorder = new RectangleF(1, (Height - rbSize) / 2, rbSize, rbSize);
-            RectangleF rectCheck = new RectangleF(rectBorder.X + (rbSize - checkSize) / 2, (Height - checkSize) / 2, checkSize, checkSize);
+            RectangleF rectBorder = new RectangleF(1, (Height - rbSize) / 2f, rbSize, rbSize);
+            RectangleF rectCheck = new RectangleF(rectBorder.X + (rbSize - checkSize) / 2f, (Height - checkSize) / 2f, checkSize, checkSize);
 
             Color renderColor = Checked ? checkedColor : (isHovering ? Color.DarkGray : unCheckedColor);
 
             using(Pen penBorder = new Pen(renderColor, 2F))
-            using(SolidBrush brushCheck = new SolidBrush(checkedColor))
-            using(SolidBrush brushText = new SolidBrush(this.ForeColor)) {
+            using(SolidBrush brushCheck = new SolidBrush(checkedColor)) {
                 graphics.DrawEllipse(penBorder, rectBorder);
                 if(Checked)
                     graphics.FillEllipse(brushCheck, rectCheck);
 
+                // OPTIMIZACIÓN SARA UI: Dibujado de texto usando TextRenderer nativo
                 Size textSize = TextRenderer.MeasureText(this.Text, this.Font);
-                graphics.DrawString(Text, Font, brushText, rbSize + 8, (Height - textSize.Height) / 2);
+                int textX = (int)rbSize + 8;
+                int textY = (Height - textSize.Height) / 2;
+                Rectangle textRect = new Rectangle(textX, textY, this.Width - textX, textSize.Height);
+
+                TextRenderer.DrawText(graphics, this.Text, this.Font, textRect, this.ForeColor, Color.Transparent, TextFormatFlags.VerticalCenter);
             }
         }
     }

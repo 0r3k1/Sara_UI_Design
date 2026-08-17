@@ -24,3 +24,9 @@ Una biblioteca de controles personalizados para **Windows Forms (.NET)** enfocad
 ## 🛠️ Requisitos
 * .NET Framework 4.8.1 o superior / .NET 6+
 * WinFormAnimation (para controles animados)
+
+## 📚 Documentación
+Esta biblioteca cuenta con documentación **XML IntelliSense**. Al usar los controles en Visual Studio, verás las sugerencias y descripciones de cada propiedad y método automáticamente.
+
+## 📄 Licencia
+Este proyecto está bajo la Licencia MIT. Eres libre de usarlo, modificarlo y distribuirlo, siempre y cuando se mantenga el aviso de derechos de autor original.

@@ -3,25 +3,24 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using System.ComponentModel;
-using System.Linq;
 
 namespace Sara_UI_Design.SaraControls {
 
     /// <summary>
     /// Control de pestañas personalizado de la suite Sara UI. 
     /// Ofrece un diseño moderno con bordes redondeados, efectos de hover, 
-    /// soporte para iconos y la capacidad de expandir las pestañas para ocupar todo el ancho disponible.
+    /// soporte para iconos organizados y alineación fluida expansiva.
     /// </summary>
+    [ToolboxItem(true)]
     public class SaraUI_TabControl:TabControl {
-        // Campos
+        // Fields
         private Color selectedTabColor = Color.MediumSlateBlue;
         private Color unselectedTabColor = Color.FromArgb(230, 230, 240);
         private Color selectedTextColor = Color.White;
         private bool stretchTabs = false;
         private int hoverIndex = -1;
         private Color contentBackColor = Color.White;
-
-        // Propiedades
+        private int tabRadius = 10; // ¡NUEVO!: Control de redondeado premium
 
         /// <summary>
         /// Obtiene o establece el color de fondo del área de contenido (TabPage).
@@ -31,13 +30,13 @@ namespace Sara_UI_Design.SaraControls {
             get => contentBackColor;
             set {
                 contentBackColor = value;
-                UpdateTabPagesColor(); // Actualizamos todas las páginas
+                UpdateTabPagesColor();
                 this.Invalidate();
             }
         }
 
         /// <summary>
-        /// Obtiene o establece el color de fondo de la pestaña que se encuentra seleccionada actualmente.
+        /// Obtiene o establece el color de fondo de la pestaña seleccionada actualmente.
         /// </summary>
         [Category("Sara UI Design")]
         public Color SelectedTabColor {
@@ -45,10 +44,17 @@ namespace Sara_UI_Design.SaraControls {
             set { selectedTabColor = value; this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el radio de curvatura superior para las pestañas de navegación.
+        /// </summary>
+        [Category("Sara UI Design")]
+        public int TabRadius {
+            get => tabRadius;
+            set { tabRadius = (value >= 0) ? value : 0; this.Invalidate(); }
+        }
 
         /// <summary>
-        /// Obtiene o establece si las pestañas deben estirarse automáticamente para cubrir 
-        /// todo el ancho horizontal del control.
+        /// Obtiene o establece si las pestañas deben estirarse automáticamente para cubrir todo el ancho horizontal del control.
         /// </summary>
         [Category("Sara UI Design")]
         public bool StretchTabs {
@@ -84,11 +90,6 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-
-        /// <summary>
-        /// Recalcula el tamaño de cada pestaña basándose en el ancho total del control 
-        /// cuando la propiedad <see cref="StretchTabs"/> está activa.
-        /// </summary>
         private void UpdateTabSize() {
             if(stretchTabs && this.Width > 0 && this.TabCount > 0) {
                 int newWidth = (this.Width / this.TabCount) - 1;
@@ -101,9 +102,6 @@ namespace Sara_UI_Design.SaraControls {
             UpdateTabSize();
         }
 
-        /// <summary>
-        /// Gestiona la detección de la pestaña bajo el cursor para aplicar el efecto visual de "Hover".
-        /// </summary>
         protected override void OnMouseMove(MouseEventArgs e) {
             base.OnMouseMove(e);
             for(int i = 0; i < this.TabCount; i++) {
@@ -127,68 +125,76 @@ namespace Sara_UI_Design.SaraControls {
             this.Invalidate();
         }
 
-        /// <summary>
-        /// Redibuja completamente el control, incluyendo el fondo del área de pestañas, 
-        /// el cuerpo de cada pestaña (seleccionada, normal o hover), los iconos y el texto centrado.
-        /// </summary>
-        /// <param name="e">Argumentos del evento de dibujo.</param>
         protected override void OnPaint(PaintEventArgs e) {
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
-            // 1. Fondo del área de pestañas (usamos el color del padre para limpieza)
+            // 1. Limpieza exterior del área de pestañas
             g.Clear(this.Parent?.BackColor ?? Color.White);
 
-            // 2. Dibujar cada pestaña
+            // 2. Renderizado individual de pestañas
             for(int i = 0; i < this.TabCount; i++) {
                 Rectangle tabRect = GetTabRect(i);
                 bool isSelected = (this.SelectedIndex == i);
                 bool isHover = (hoverIndex == i);
 
-                Color bgColor = isSelected ? selectedTabColor : (isHover ? Color.FromArgb(210, 210, 230) : unselectedTabColor);
+                // Variación fluida de color según el estado
+                Color bgColor = isSelected ? selectedTabColor : (isHover ? Color.FromArgb(215, 215, 235) : unselectedTabColor);
 
-                using(GraphicsPath path = GetTabPath(tabRect))
+                using(GraphicsPath path = GetTabPath(tabRect, tabRadius))
                 using(SolidBrush brush = new SolidBrush(bgColor)) {
                     g.FillPath(brush, path);
                 }
 
+                // Línea indicadora blanca inferior para la pestaña activa
                 if(isSelected) {
                     using(SolidBrush accentBrush = new SolidBrush(Color.White)) {
                         g.FillRectangle(accentBrush, tabRect.X + 15, tabRect.Bottom - 4, tabRect.Width - 30, 3);
                     }
                 }
 
-                // Icono
-                int iconOffset = 10;
+                // Cálculo dinámico para evitar colisión de Iconos y Texto
+                int iconOffset = 0;
                 if(this.ImageList != null && this.TabPages[i].ImageIndex >= 0) {
                     Image img = this.ImageList.Images[this.TabPages[i].ImageIndex];
-                    g.DrawImage(img, tabRect.X + 10, tabRect.Y + (tabRect.Height - 16) / 2, 16, 16);
-                    iconOffset = 30;
+                    int imgY = tabRect.Y + (tabRect.Height - 16) / 2;
+                    g.DrawImage(img, tabRect.X + 12, imgY, 16, 16);
+                    iconOffset = 24; // Espacio que consume el icono
                 }
 
-                // Texto
-                TextRenderer.DrawText(g, this.TabPages[i].Text, this.Font, tabRect,
+                // ¡SOLUCIÓN BUG VISUAL!: Desplazamos el área de texto si hay un icono presente
+                Rectangle textRect = new Rectangle(
+                    tabRect.X + iconOffset,
+                    tabRect.Y,
+                    tabRect.Width - iconOffset,
+                    tabRect.Height
+                );
+
+                TextRenderer.DrawText(g, this.TabPages[i].Text, this.Font, textRect,
                      isSelected ? selectedTextColor : Color.DimGray,
-                     TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter);
+                     TextFormatFlags.VerticalCenter | TextFormatFlags.HorizontalCenter | TextFormatFlags.EndEllipsis);
             }
 
-            // 3. Sincronizar fondo de la página activa (AHORA USA LA VARIABLE)
+            // 3. Sincronizar el contenedor de la página activa
             if(this.SelectedTab != null && this.SelectedTab.BackColor != contentBackColor) {
                 this.SelectedTab.BackColor = contentBackColor;
             }
         }
 
-        /// <summary>
-        /// Genera el trazado geométrico para una pestaña, aplicando esquinas redondeadas 
-        /// únicamente en la parte superior para mantener la unión con el panel de contenido.
-        /// </summary>
-        /// <param name="rect">Rectángulo que define el área de la pestaña.</param>
-        /// <returns>Un objeto <see cref="GraphicsPath"/> con la forma de la pestaña.</returns>
-        private GraphicsPath GetTabPath(Rectangle rect) {
+        private GraphicsPath GetTabPath(Rectangle rect, int radius) {
             GraphicsPath path = new GraphicsPath();
-            int radius = 8;
-            path.AddArc(rect.X, rect.Y, radius, radius, 180, 90);
-            path.AddArc(rect.Right - radius, rect.Y, radius, radius, 270, 90);
+            float s = radius * 2F;
+
+            // Limitadores matemáticos para evitar deformación por radios excesivos
+            if(s > rect.Height)
+                s = rect.Height;
+            if(s > rect.Width)
+                s = rect.Width;
+            if(s <= 0)
+                s = 1;
+
+            path.AddArc(rect.X, rect.Y, s, s, 180, 90);
+            path.AddArc(rect.Right - s, rect.Y, s, s, 270, 90);
             path.AddLine(rect.Right, rect.Bottom, rect.X, rect.Bottom);
             path.CloseFigure();
             return path;

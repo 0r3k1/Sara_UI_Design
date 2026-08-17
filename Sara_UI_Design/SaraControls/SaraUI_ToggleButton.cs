@@ -8,9 +8,9 @@ namespace Sara_UI_Design.SaraControls {
 
     /// <summary>
     /// Representa un interruptor de palanca (Toggle Switch) personalizado de la suite Sara UI. 
-    /// Sustituye la apariencia del CheckBox estándar por una interfaz de deslizamiento 
-    /// con estilos sólidos o de contorno.
+    /// Sustituye la apariencia del CheckBox estándar por una interfaz de deslizamiento fluida.
     /// </summary>
+    [ToolboxItem(true)]
     public class SaraUI_ToggleButton:CheckBox {
         // Campos
         private Color onBackColor = Color.MediumSlateBlue;
@@ -18,8 +18,6 @@ namespace Sara_UI_Design.SaraControls {
         private Color offBackColor = Color.Gray;
         private Color offToggleColor = Color.Gainsboro;
         private bool solidStyle = true;
-
-        // Propiedades
 
         /// <summary>
         /// Obtiene o establece el color de fondo del interruptor cuando está en estado activado (Checked).
@@ -38,7 +36,6 @@ namespace Sara_UI_Design.SaraControls {
             get => onToggleColor;
             set { onToggleColor = value; this.Invalidate(); }
         }
-
 
         /// <summary>
         /// Obtiene o establece el color de fondo del interruptor cuando está en estado desactivado.
@@ -64,10 +61,8 @@ namespace Sara_UI_Design.SaraControls {
             set { }
         }
 
-
         /// <summary>
-        /// Obtiene o establece si el interruptor se dibuja con un relleno sólido (true) 
-        /// o únicamente con un contorno (false).
+        /// Obtiene o establece si el interruptor se dibuja con un relleno sólido (true) o únicamente con un contorno (false).
         /// </summary>
         [Category("Sara UI Design")]
         [DefaultValue(true)]
@@ -76,27 +71,18 @@ namespace Sara_UI_Design.SaraControls {
             set { solidStyle = value; this.Invalidate(); }
         }
 
-
         /// <summary>
         /// Inicializa una nueva instancia de <see cref="SaraUI_ToggleButton"/> definiendo un tamaño mínimo, 
-        /// el cursor de mano y habilitando el doble búfer para transiciones visuales suaves.
+        /// el cursor de mano y habilitando el doble búfer para transiciones visuales de deslizamiento suaves.
         /// </summary>
         public SaraUI_ToggleButton() {
             this.MinimumSize = new Size(45, 22);
             this.Cursor = Cursors.Hand;
-            // Evitar parpadeo (Flickering)
             this.SetStyle(ControlStyles.UserPaint |
                           ControlStyles.AllPaintingInWmPaint |
                           ControlStyles.OptimizedDoubleBuffer, true);
         }
 
-        // Métodos
-
-        /// <summary>
-        /// Genera el trazado geométrico en forma de cápsula para el cuerpo del interruptor, 
-        /// calculando arcos basados en la altura del control.
-        /// </summary>
-        /// <returns>Un objeto <see cref="GraphicsPath"/> con la silueta del control.</returns>
         private GraphicsPath GetFigurePath() {
             int arcSize = this.Height - 1;
             Rectangle leftArc = new Rectangle(0, 0, arcSize, arcSize);
@@ -115,38 +101,39 @@ namespace Sara_UI_Design.SaraControls {
             Graphics graphics = pevent.Graphics;
             graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
-            // Limpiar el fondo con el color del padre para evitar bordes extraños
             graphics.Clear(this.Parent?.BackColor ?? Color.White);
 
             int toggleSize = this.Height - 5;
             Rectangle rectToggle;
 
-            if(this.Checked) { // ESTADO ON
-                // Dibujar superficie
+            if(this.Checked) {
+                // ESTADO ON
                 if(solidStyle) {
                     using(SolidBrush brush = new SolidBrush(onBackColor))
                         graphics.FillPath(brush, GetFigurePath());
                 } else {
-                    using(Pen pen = new Pen(onBackColor, 2))
+                    using(Pen pen = new Pen(onBackColor, 2)) {
+                        pen.Alignment = PenAlignment.Inset; // CORREGIDO: Evita el recorte de línea exterior
                         graphics.DrawPath(pen, GetFigurePath());
+                    }
                 }
 
-                // Dibujar el círculo (Toggle) a la derecha
                 rectToggle = new Rectangle(this.Width - this.Height + 2, 2, toggleSize, toggleSize);
                 using(SolidBrush brush = new SolidBrush(onToggleColor))
                     graphics.FillEllipse(brush, rectToggle);
 
-            } else { // ESTADO OFF
-                // Dibujar superficie
+            } else {
+                // ESTADO OFF
                 if(solidStyle) {
                     using(SolidBrush brush = new SolidBrush(offBackColor))
                         graphics.FillPath(brush, GetFigurePath());
                 } else {
-                    using(Pen pen = new Pen(offBackColor, 2))
+                    using(Pen pen = new Pen(offBackColor, 2)) {
+                        pen.Alignment = PenAlignment.Inset; // CORREGIDO: Evita el recorte de línea exterior
                         graphics.DrawPath(pen, GetFigurePath());
+                    }
                 }
 
-                // Dibujar el círculo (Toggle) a la izquierda
                 rectToggle = new Rectangle(3, 2, toggleSize, toggleSize);
                 using(SolidBrush brush = new SolidBrush(offToggleColor))
                     graphics.FillEllipse(brush, rectToggle);

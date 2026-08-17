@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace Sara_UI_Design.SaraControls {
 
@@ -13,17 +14,19 @@ namespace Sara_UI_Design.SaraControls {
     /// Permite definir filas y columnas usando unidades fraccionales (fr) o píxeles fijos, 
     /// organizando los controles hijos automáticamente.
     /// </summary>
+    [ToolboxItem(true)]
     public class SaraUI_GridPanel:Panel {
-        /// <summary>
-        /// SUGERENCIA DE USO: Para posicionar un control manualmente en el Grid, 
-        /// use la propiedad 'Tag' del control hijo con el formato "fila,columna" (ej. "0,1").
-        /// Si no se especifica, el control seguirá el flujo automático.
-        /// </summary>
+
         private string columnsConfig = "1fr, 1fr";
         private string rowsConfig = "1fr";
         private int columnGap = 10;
         private int rowGap = 10;
         private int borderRadius = 0;
+
+        // Fields para arrastre de ventana (Especial para Logins sin bordes)
+        private bool allowFormDrag = false;
+        private bool isDraggingForm = false;
+        private Point mouseStartPos;
 
         /// <summary>
         /// Obtiene o establece la configuración de columnas. 
@@ -57,9 +60,25 @@ namespace Sara_UI_Design.SaraControls {
         [Category("Sara UI Design")]
         public int BorderRadius { get => borderRadius; set { borderRadius = value; Invalidate(); } }
 
+        /// <summary>
+        /// Permite arrastrar el formulario completo haciendo clic y arrastrando sobre áreas vacías del Grid.
+        /// Muy útil para ventanas de inicio de sesión personalizadas sin bordes nativos.
+        /// </summary>
+        [Category("Sara UI Design")]
+        [Description("Permite mover la ventana completa arrastrando el fondo del Grid.")]
+        [DefaultValue(false)]
+        public bool AllowFormDrag { get => allowFormDrag; set => allowFormDrag = value; }
+
+        [Category("Sara UI Design")]
+        [DefaultValue(typeof(Padding), "10,10,10,10")]
+        public new Padding Padding {
+            get => base.Padding;
+            set { base.Padding = value; PerformLayout(); }
+        }
+
         public SaraUI_GridPanel() {
             this.DoubleBuffered = true;
-            this.Padding = new Padding(10);
+            base.Padding = new Padding(10); // Establecemos el valor inicial a través de la base
         }
 
         /// <summary>
@@ -83,12 +102,10 @@ namespace Sara_UI_Design.SaraControls {
                 int r = 0, c = 0;
                 bool hasValidTag = false;
 
-                // Intentar extraer coordenadas: "fila,columna"
                 if(ctrl.Tag != null) {
                     string tagValue = ctrl.Tag.ToString();
                     if(tagValue.Contains(",")) {
                         var coords = tagValue.Split(',');
-                        // Usamos TryParse y Trim para limpiar espacios extra
                         if(int.TryParse(coords[0].Trim(), out int row) &&
                             int.TryParse(coords[1].Trim(), out int col)) {
                             r = row;
@@ -98,13 +115,11 @@ namespace Sara_UI_Design.SaraControls {
                     }
                 }
 
-                // Si no tiene Tag válido, aplicamos el flujo automático (Auto-flow)
                 if(!hasValidTag) {
-                    r = controlIndex / colDefinitions.Count;
-                    c = controlIndex % colDefinitions.Count;
+                    r = controlIndex / Math.Max(1, colDefinitions.Count);
+                    c = controlIndex % Math.Max(1, colDefinitions.Count);
                 }
 
-                // Posicionamiento final
                 if(r < rowDefinitions.Count && c < colDefinitions.Count) {
                     float x = Padding.Left + colDefinitions.Take(c).Sum(d => d + columnGap);
                     float y = Padding.Top + rowDefinitions.Take(r).Sum(d => d + rowGap);
@@ -113,22 +128,18 @@ namespace Sara_UI_Design.SaraControls {
                     ctrl.Size = new Size((int)colDefinitions[c], (int)rowDefinitions[r]);
                 }
 
-                // Solo aumentamos el índice si el control NO fue posicionado manualmente
-                // Esto permite que el flujo automático rellene los huecos
                 if(!hasValidTag)
                     controlIndex++;
             }
         }
 
         /// <summary>
-        /// Analiza las cadenas de configuración (ej. "1fr, 100") y las traduce a valores reales de píxeles 
-        /// basándose en el espacio disponible en el panel.
+        /// Analiza las cadenas de configuración (ej. "1fr, 100") de manera segura e independiente de la región cultural.
         /// </summary>
-        /// <param name="config">Cadena de configuración de filas o columnas.</param>
-        /// <param name="availableSize">Tamaño total disponible (ancho o alto).</param>
-        /// <param name="gap">Espacio de separación entre elementos.</param>
-        /// <returns>Una lista con los tamaños calculados para cada división.</returns>
         private List<float> ParseConfig(string config, float availableSize, int gap) {
+            if(string.IsNullOrWhiteSpace(config))
+                return new List<float> { availableSize };
+
             string[] parts = config.Split(',');
             int n = parts.Length;
             float totalGap = gap * (n - 1);
@@ -141,13 +152,16 @@ namespace Sara_UI_Design.SaraControls {
             foreach(var part in parts) {
                 string p = part.Trim().ToLower();
                 if(p.EndsWith("fr")) {
-                    float val = float.Parse(p.Replace("fr", ""));
-                    totalFr += val;
-                    definitions.Add(new GridUnit { Value = val, IsFr = true });
+                    // Usamos InvariantCulture para evitar que falle en sistemas operativos configurados con comas en los decimales
+                    if(float.TryParse(p.Replace("fr", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out float val)) {
+                        totalFr += val;
+                        definitions.Add(new GridUnit { Value = val, IsFr = true });
+                    }
                 } else {
-                    float val = float.Parse(p);
-                    fixedSum += val;
-                    definitions.Add(new GridUnit { Value = val, IsFr = false });
+                    if(float.TryParse(p, NumberStyles.Any, CultureInfo.InvariantCulture, out float val)) {
+                        fixedSum += val;
+                        definitions.Add(new GridUnit { Value = val, IsFr = false });
+                    }
                 }
             }
 
@@ -156,6 +170,35 @@ namespace Sara_UI_Design.SaraControls {
         }
 
         private struct GridUnit { public float Value; public bool IsFr; }
+
+        // ====================================================================
+        // INTERACTIVIDAD: ARRASTRE DE VENTANA SIN BORDES
+        // ====================================================================
+        protected override void OnMouseDown(MouseEventArgs e) {
+            base.OnMouseDown(e);
+            if(allowFormDrag && e.Button == MouseButtons.Left) {
+                isDraggingForm = true;
+                mouseStartPos = e.Location;
+            }
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e) {
+            base.OnMouseMove(e);
+            if(isDraggingForm) {
+                Form parentForm = this.FindForm();
+                if(parentForm != null) {
+                    parentForm.Location = new Point(
+                        parentForm.Location.X + (e.X - mouseStartPos.X),
+                        parentForm.Location.Y + (e.Y - mouseStartPos.Y)
+                    );
+                }
+            }
+        }
+
+        protected override void OnMouseUp(MouseEventArgs e) {
+            base.OnMouseUp(e);
+            isDraggingForm = false;
+        }
 
         protected override void OnPaint(PaintEventArgs e) {
             base.OnPaint(e);
@@ -167,9 +210,6 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
-        /// <summary>
-        /// Crea el trazado geométrico necesario para recortar el panel con bordes redondeados.
-        /// </summary>
         private GraphicsPath GetFigurePath(Rectangle rect, int radius) {
             GraphicsPath path = new GraphicsPath();
             float s = radius * 2F;
@@ -178,9 +218,9 @@ namespace Sara_UI_Design.SaraControls {
                 s = rect.Width;
             if(s > rect.Height)
                 s = rect.Height;
-
             if(s <= 0)
                 s = 1;
+
             path.AddArc(rect.X, rect.Y, s, s, 180, 90);
             path.AddArc(rect.Right - s, rect.Y, s, s, 270, 90);
             path.AddArc(rect.Right - s, rect.Bottom - s, s, s, 0, 90);
@@ -192,9 +232,6 @@ namespace Sara_UI_Design.SaraControls {
         /// <summary>
         /// Método de utilidad para asignar la posición de un control dentro del Grid.
         /// </summary>
-        /// <param name="ctrl">Control hijo al que se le asignará la posición.</param>
-        /// <param name="row">Índice de la fila (empezando en 0).</param>
-        /// <param name="col">Índice de la columna (empezando en 0).</param>
         public static void SetGridPosition(Control ctrl, int row, int col) {
             if(ctrl == null)
                 return;

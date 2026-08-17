@@ -8,8 +8,9 @@ namespace Sara_UI_Design.SaraControls {
 
     /// <summary>
     /// Control gráfico simple para dibujar líneas separadoras horizontales o verticales 
-    /// con soporte para diferentes grosores, colores y estilos de trazo.
+    /// con soporte para diferentes grosores, colores y estilos de trazo redondeado.
     /// </summary>
+    [ToolboxItem(true)]
     public class SaraUI_Line:Control {
 
         /// <summary>
@@ -22,8 +23,6 @@ namespace Sara_UI_Design.SaraControls {
         private int lineWidth = 2;
         private Color lineColor = Color.DimGray;
         private DashStyle lineStyle = DashStyle.Solid;
-
-        // Properties
 
         /// <summary>
         /// Obtiene o establece si la línea se dibuja de forma horizontal o vertical.
@@ -63,23 +62,23 @@ namespace Sara_UI_Design.SaraControls {
 
         /// <summary>
         /// Inicializa una nueva instancia de <see cref="SaraUI_Line"/> con fondo transparente 
-        /// y optimizaciones de redibujado.
+        /// y optimizaciones de redibujado fluido.
         /// </summary>
         public SaraUI_Line() {
-            // Estilos para evitar parpadeo y permitir fondos transparentes
             this.SetStyle(ControlStyles.SupportsTransparentBackColor |
                           ControlStyles.OptimizedDoubleBuffer |
                           ControlStyles.ResizeRedraw |
                           ControlStyles.UserPaint, true);
 
             this.BackColor = Color.Transparent;
-            this.Size = new Size(100, 2); // Tamaño inicial por defecto
+            this.Size = new Size(100, 2);
         }
 
         /// <summary>
-        /// Renderiza la línea en el centro del control aplicando el estilo y grosor definidos.
+        /// Renderiza la línea en el centro del control aplicando el estilo, grosor y acabados esféricos suaves.
         /// </summary>
         protected override void OnPaint(PaintEventArgs e) {
+            // CORRECCIÓN: Llamada limpia al método base sin el parámetro nombrado erróneo
             base.OnPaint(e);
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
@@ -87,14 +86,16 @@ namespace Sara_UI_Design.SaraControls {
             using(Pen pen = new Pen(lineColor, lineWidth)) {
                 pen.DashStyle = lineStyle;
 
+                // Aplicamos el acabado curvo en las puntas para suavizar la suite
+                pen.StartCap = LineCap.Round;
+                pen.EndCap = LineCap.Round;
+
                 if(orientation == LineOrientation.Horizontal) {
-                    // Dibuja la línea centrada verticalmente
                     float y = this.Height / 2.0f;
-                    g.DrawLine(pen, 0, y, this.Width, y);
+                    g.DrawLine(pen, lineWidth / 2f, y, this.Width - (lineWidth / 2f), y);
                 } else {
-                    // Dibuja la línea centrada horizontalmente
                     float x = this.Width / 2.0f;
-                    g.DrawLine(pen, x, 0, x, this.Height);
+                    g.DrawLine(pen, x, lineWidth / 2f, x, this.Height - (lineWidth / 2f));
                 }
             }
         }
