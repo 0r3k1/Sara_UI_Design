@@ -1,32 +1,51 @@
-# Sara_UI_Design 🎨
+# Sara UI Design 🎨
 
-Una biblioteca de controles personalizados para **Windows Forms (.NET)** enfocada en diseño moderno, flexibilidad y facilidad de uso.
+Una biblioteca de controles personalizados para **Windows Forms sobre .NET**, enfocada en diseño moderno, flexibilidad y facilidad de uso.
 
-## ✨ Controles Incluidos
+## ✨ Controles incluidos
 
-* **SaraUI_FlexPanel**: Panel con lógica inspirada en CSS Flexbox (Start, Center, End, SpaceBetween, etc.).
-* **SaraUI_ShadowPanel**: Panel con sombras proyectadas (Drop Shadow) y bordes redondeados.
-* **SaraUI_Button**: Botones estilizados con soporte para bordes redondeados.
-* **SaraUI_TextBox**: Caja de texto con Placeholder, validación de tipos y diseño líquido.
-* **SaraUI_CircularProgressBar**: Progreso circular animado con soporte para texto y símbolos.
-* **SaraUI_ToggleButton**: Interruptor On/Off moderno.
-* **SaraUI_ComboBox**: Lista desplegable totalmente personalizable.
-* **SaraUI_PictureBox**: Soporte para imágenes circulares con bordes degradados.
-* **SaraUI_RadioButton**: Botones de opción con efectos de hover y diseño limpio.
-* **SaraUI_Line**: Separador horizontal/vertical para organizar interfaces.
+- **SaraUI_FlexPanel**: panel con lógica inspirada en CSS Flexbox.
+- **SaraUI_ShadowPanel**: panel con sombras proyectadas y bordes redondeados.
+- **SaraUI_Button**: botón estilizado con soporte para bordes redondeados.
+- **SaraUI_TextBox**: entrada con placeholder, validación e iconos.
+- **SaraUI_CircularProgressBar**: progreso circular animado.
+- **SaraUI_ToggleButton**: interruptor moderno de encendido y apagado.
+- **SaraUI_ComboBox**: lista desplegable personalizable.
+- **SaraUI_PictureBox**: imágenes circulares con bordes degradados.
+- **SaraUI_RadioButton**: botón de opción con efectos visuales.
+- **SaraUI_Line**: separador horizontal o vertical.
 
 ## 🚀 Instalación
 
-1. Descarga el repositorio o compila el proyecto para generar el `.dll`.
-2. Agrega la referencia `Sara_UI_Design.dll` a tu proyecto de WinForms.
-3. ¡Arrastra los controles desde tu Cuadro de Herramientas!
+### Opción A: NuGet
 
-## 🛠️ Requisitos
-* .NET Framework 4.8.1 o superior / .NET 6+
-* WinFormAnimation (para controles animados)
+Desde la terminal:
+
+```powershell
+dotnet add package Sara_UI_Design
+```
+
+También puedes buscar `Sara_UI_Design` desde el administrador de paquetes NuGet de Visual Studio.
+
+### Opción B: referencia manual
+
+1. Descarga o clona el repositorio.
+2. Compila el proyecto para generar `Sara_UI_Design.dll`.
+3. Agrega la DLL como referencia en tu proyecto de Windows Forms.
+4. Agrega los controles al Cuadro de herramientas de Visual Studio.
+
+## 🛠️ Requisitos actuales
+
+- Windows.
+- Windows Forms sobre .NET 8 (`net8.0-windows`).
+- `WinFormAnimation 1.6.0.4` para los controles que todavía utilizan animaciones.
+
+La dependencia `WinFormAnimation` será reemplazada progresivamente por un motor de animaciones propio.
 
 ## 📚 Documentación
-Esta biblioteca cuenta con documentación **XML IntelliSense**. Al usar los controles en Visual Studio, verás las sugerencias y descripciones de cada propiedad y método automáticamente.
+
+La biblioteca genera documentación XML para IntelliSense. Visual Studio puede mostrar descripciones de las propiedades, los eventos y los métodos públicos documentados.
 
 ## 📄 Licencia
-Este proyecto está bajo la Licencia MIT. Eres libre de usarlo, modificarlo y distribuirlo, siempre y cuando se mantenga el aviso de derechos de autor original.
+
+Este proyecto utiliza la Licencia MIT. Puede usarse, modificarse y distribuirse conservando el aviso de derechos de autor correspondiente.
