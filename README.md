@@ -37,10 +37,26 @@ También puedes buscar `Sara_UI_Design` desde el administrador de paquetes NuGet
 ## 🛠️ Requisitos actuales
 
 - Windows.
-- Windows Forms sobre .NET 8 (`net8.0-windows`).
+- Windows Forms sobre .NET 8 (`net8.0-windows`) o .NET Framework 4.8 (`net48`).
 - `WinFormAnimation 1.6.0.4` para los controles que todavía utilizan animaciones.
 
 La dependencia `WinFormAnimation` será reemplazada progresivamente por un motor de animaciones propio.
+
+## 🧪 Compilación y demostración
+
+La solución contiene dos proyectos:
+
+- `Sara_UI_Design`: biblioteca de controles compilada para .NET 8 y .NET Framework 4.8.
+- `Sara_UI_Design.Demo`: aplicación visual para explorar y comprobar los controles en ambos entornos.
+
+Para compilar toda la solución en modo Release:
+
+```powershell
+dotnet restore .\Sara_UI_Design.slnx
+dotnet build .\Sara_UI_Design.slnx --configuration Release
+```
+
+También puedes establecer `Sara_UI_Design.Demo` como proyecto de inicio desde Visual Studio y elegir el framework que deseas ejecutar.
 
 ## 📚 Documentación
 

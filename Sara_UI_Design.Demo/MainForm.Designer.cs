@@ -1,5 +1,5 @@
-﻿namespace Test_Sara_UI {
-    partial class Form1 {
+﻿namespace Sara_UI_Design.Demo {
+    partial class MainForm {
         /// <summary>
         ///  Required designer variable.
         /// </summary>
@@ -103,14 +103,15 @@
             sarauI_ComboBox2.TabIndex = 1;
             sarauI_ComboBox2.Texts = "";
             // 
-            // Form1
+            // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1190, 725);
             Controls.Add(sarauI_GridPanel1);
-            Name = "Form1";
-            Text = "Form1";
+            Name = "MainForm";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Sara UI Design - Demostración";
             sarauI_GridPanel1.ResumeLayout(false);
             panel1.ResumeLayout(false);
             ResumeLayout(false);
