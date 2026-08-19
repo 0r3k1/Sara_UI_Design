@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -18,12 +17,30 @@ namespace Sara_UI_Design.SaraControls {
         /// <summary>
         /// Define el comportamiento del cuadro de texto según el tipo de datos esperado.
         /// </summary>
-        public enum InputType { Text, Password, Numeric, Multiline }
+        public enum InputType {
+            /// <summary>Permite introducir texto sin restricciones adicionales.</summary>
+            Text,
+
+            /// <summary>Oculta el contenido utilizando el carácter de contraseña del sistema.</summary>
+            Password,
+
+            /// <summary>Acepta únicamente caracteres numéricos.</summary>
+            Numeric,
+
+            /// <summary>Permite introducir texto distribuido en varias líneas.</summary>
+            Multiline
+        }
 
         /// <summary>
         /// Define la ubicación del icono dentro del control.
         /// </summary>
-        public enum SaraIconLocation { Left, Right }
+        public enum SaraIconLocation {
+            /// <summary>Coloca el icono a la izquierda del contenido.</summary>
+            Left,
+
+            /// <summary>Coloca el icono a la derecha del contenido.</summary>
+            Right
+        }
 
         // Fields de diseño
         private Color borderColor = Color.MediumSlateBlue;
@@ -39,6 +56,7 @@ namespace Sara_UI_Design.SaraControls {
         private Color placeholderColor = Color.Gray;
         private Color mainForeColor = Color.Black;
         private InputType inputType = InputType.Text;
+        private bool isUpdatingEditor = false;
 
         // Fields de Icono
         private string iconName = "None";
@@ -48,6 +66,8 @@ namespace Sara_UI_Design.SaraControls {
 
         /// <summary>
         /// Ocurre cuando el contenido de texto dentro del control cambia.
+        /// Se conserva para mantener compatibilidad; el evento estándar <see cref="Control.TextChanged"/>
+        /// también se genera con el mismo cambio lógico.
         /// </summary>
         public event EventHandler? _TextChanged;
 
@@ -57,20 +77,21 @@ namespace Sara_UI_Design.SaraControls {
         /// </summary>
         public SaraUI_TextBox() {
             InitializeComponent();
-            this.mainForeColor = this.ForeColor;
+            mainForeColor = ForeColor;
             ConfigureTextBoxEvents();
 
-            // Forzar configuraciones e hilos iniciales críticos
             ApplyInputType();
             UpdatePadding();
+            UpdateEditorPresentation();
+            UpdateControlRegion();
         }
 
         private void ConfigureTextBoxEvents() {
-            textBox1.TextChanged += (s, e) => _TextChanged?.Invoke(this, e);
-            textBox1.Enter += (s, e) => { isFocused = true; RemovePlaceholder(); this.Invalidate(); };
-            textBox1.Leave += (s, e) => { isFocused = false; SetPlaceholder(); this.Invalidate(); };
+            textBox1.TextChanged += TextBox1_TextChanged;
+            textBox1.Enter += TextBox1_Enter;
+            textBox1.Leave += TextBox1_Leave;
             textBox1.KeyPress += textBox1_KeyPress;
-            textBox1.Click += (s, e) => this.OnClick(e);
+            textBox1.Click += TextBox1_Click;
         }
 
         /// <summary>
@@ -81,22 +102,8 @@ namespace Sara_UI_Design.SaraControls {
         [EditorBrowsable(EditorBrowsableState.Always)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public override string Text {
-            get {
-                return isPlaceholder ? string.Empty : textBox1.Text;
-            }
-            set {
-                if(string.IsNullOrEmpty(value)) {
-                    textBox1.Text = "";
-                    SetPlaceholder();
-                } else {
-                    isPlaceholder = false;
-                    textBox1.ForeColor = mainForeColor;
-                    textBox1.Text = value;
-                    if(inputType == InputType.Password)
-                        textBox1.UseSystemPasswordChar = true;
-                }
-                this.Invalidate();
-            }
+            get => base.Text ?? string.Empty;
+            set => SetLogicalText(value ?? string.Empty, true);
         }
 
         /// <summary>
@@ -105,14 +112,10 @@ namespace Sara_UI_Design.SaraControls {
         [Category("Sara UI Design")]
         public override Color BackColor {
             get => base.BackColor;
-            set {
-                base.BackColor = value;
-                if(textBox1 != null)
-                    textBox1.BackColor = value;
-                this.Invalidate();
-            }
+            set => base.BackColor = value;
         }
 
+        /// <inheritdoc/>
         protected override void OnBackColorChanged(EventArgs e) {
             base.OnBackColorChanged(e);
             if(textBox1 != null)
@@ -120,18 +123,24 @@ namespace Sara_UI_Design.SaraControls {
             this.Invalidate();
         }
 
+        /// <inheritdoc/>
         protected override void OnForeColorChanged(EventArgs e) {
             base.OnForeColorChanged(e);
             mainForeColor = this.ForeColor;
             if(!isPlaceholder && textBox1 != null)
                 textBox1.ForeColor = this.ForeColor;
+            this.Invalidate();
         }
 
+        /// <inheritdoc/>
         protected override void OnFontChanged(EventArgs e) {
             base.OnFontChanged(e);
-            if(textBox1 != null)
-                textBox1.Font = this.Font;
+            if(textBox1 == null)
+                return;
+
+            textBox1.Font = this.Font;
             UpdateControlHeight();
+            this.Invalidate();
         }
 
         // ==========================================
@@ -145,7 +154,11 @@ namespace Sara_UI_Design.SaraControls {
         [TypeConverter(typeof(IconNameConverter))]
         public string IconName {
             get => iconName;
-            set { iconName = value; UpdatePadding(); this.Invalidate(); }
+            set {
+                iconName = string.IsNullOrWhiteSpace(value) ? "None" : value;
+                UpdatePadding();
+                this.Invalidate();
+            }
         }
 
         /// <summary>
@@ -158,7 +171,14 @@ namespace Sara_UI_Design.SaraControls {
         /// Obtiene o establece el tamaño en píxeles del icono (ancho y alto proporcional).
         /// </summary>
         [Category("Sara UI Design")]
-        public int IconSize { get => iconSize; set { iconSize = value; UpdatePadding(); this.Invalidate(); } }
+        public int IconSize {
+            get => iconSize;
+            set {
+                iconSize = Math.Max(1, value);
+                UpdatePadding();
+                this.Invalidate();
+            }
+        }
 
         /// <summary>
         /// Define si el icono se posiciona al inicio (izquierda) o al final (derecha) del texto.
@@ -172,7 +192,11 @@ namespace Sara_UI_Design.SaraControls {
         [Category("Sara UI Design")]
         public int BorderSize {
             get => borderSize;
-            set { borderSize = value; UpdatePadding(); this.Invalidate(); }
+            set {
+                borderSize = Math.Max(0, value);
+                UpdatePadding();
+                this.Invalidate();
+            }
         }
 
         /// <summary>
@@ -181,7 +205,14 @@ namespace Sara_UI_Design.SaraControls {
         [Category("Sara UI Design")]
         public InputType Type {
             get => inputType;
-            set { inputType = value; ApplyInputType(); this.Invalidate(); }
+            set {
+                if(inputType == value)
+                    return;
+
+                inputType = value;
+                ApplyInputType();
+                this.Invalidate();
+            }
         }
 
         /// <summary>
@@ -190,7 +221,12 @@ namespace Sara_UI_Design.SaraControls {
         [Category("Sara UI Design")]
         public Color PlaceholderColor {
             get => placeholderColor;
-            set { placeholderColor = value; if(isPlaceholder) textBox1.ForeColor = value; }
+            set {
+                placeholderColor = value;
+                if(isPlaceholder)
+                    textBox1.ForeColor = value;
+                this.Invalidate();
+            }
         }
 
         /// <summary>
@@ -199,7 +235,11 @@ namespace Sara_UI_Design.SaraControls {
         [Category("Sara UI Design")]
         public string PlaceholderText {
             get => placeholderText;
-            set { placeholderText = value; SetPlaceholder(); }
+            set {
+                placeholderText = value ?? string.Empty;
+                UpdateEditorPresentation();
+                this.Invalidate();
+            }
         }
 
         /// <summary>
@@ -208,7 +248,11 @@ namespace Sara_UI_Design.SaraControls {
         [Category("Sara UI Design")]
         public int BorderRadius {
             get => borderRadius;
-            set { borderRadius = (value >= 0) ? value : 0; this.Invalidate(); }
+            set {
+                borderRadius = Math.Max(0, value);
+                UpdateControlRegion();
+                this.Invalidate();
+            }
         }
 
         /// <summary>
@@ -226,7 +270,7 @@ namespace Sara_UI_Design.SaraControls {
         [Category("Sara UI Design")]
         public Color BorderFocusColor {
             get => borderFocusColor;
-            set { borderFocusColor = value; }
+            set { borderFocusColor = value; this.Invalidate(); }
         }
 
         /// <summary>
@@ -235,7 +279,11 @@ namespace Sara_UI_Design.SaraControls {
         [Category("Sara UI Design")]
         public bool UnderlinedStyle {
             get => underlinedStyle;
-            set { underlinedStyle = value; this.Invalidate(); }
+            set {
+                underlinedStyle = value;
+                UpdateControlRegion();
+                this.Invalidate();
+            }
         }
 
         // ==========================================
@@ -246,57 +294,146 @@ namespace Sara_UI_Design.SaraControls {
             switch(inputType) {
                 case InputType.Multiline:
                 textBox1.Multiline = true;
-                textBox1.UseSystemPasswordChar = false;
                 break;
 
                 case InputType.Password:
                 textBox1.Multiline = false;
-                textBox1.UseSystemPasswordChar = !isPlaceholder;
                 UpdateControlHeight();
                 break;
 
                 case InputType.Numeric:
+                SetLogicalText(SanitizeNumericText(base.Text ?? string.Empty), true);
+                textBox1.Multiline = false;
+                UpdateControlHeight();
+                break;
+
                 case InputType.Text:
                 textBox1.Multiline = false;
-                textBox1.UseSystemPasswordChar = false;
                 UpdateControlHeight();
                 break;
             }
+
+            UpdateEditorPresentation();
         }
 
-        private void textBox1_KeyPress(object sender, KeyPressEventArgs e) {
+        private void TextBox1_TextChanged(object? sender, EventArgs e) {
+            if(isUpdatingEditor || isPlaceholder)
+                return;
+
+            string editorText = textBox1.Text;
+            if(inputType == InputType.Numeric) {
+                int caretPosition = CountDigitsBefore(textBox1.Text, textBox1.SelectionStart);
+                string sanitizedText = SanitizeNumericText(editorText);
+
+                if(editorText != sanitizedText) {
+                    SetEditorText(sanitizedText);
+                    textBox1.SelectionStart = Math.Min(caretPosition, sanitizedText.Length);
+                }
+
+                editorText = sanitizedText;
+            }
+
+            SetLogicalText(editorText, false);
+        }
+
+        private void TextBox1_Enter(object? sender, EventArgs e) {
+            isFocused = true;
+            UpdateEditorPresentation();
+            this.Invalidate();
+        }
+
+        private void TextBox1_Leave(object? sender, EventArgs e) {
+            isFocused = false;
+            UpdateEditorPresentation();
+            this.Invalidate();
+        }
+
+        private void TextBox1_Click(object? sender, EventArgs e) {
+            this.OnClick(e);
+        }
+
+        private void textBox1_KeyPress(object? sender, KeyPressEventArgs e) {
             if(inputType == InputType.Numeric && !char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar)) {
                 e.Handled = true;
             }
             this.OnKeyPress(e);
         }
 
-        /// <summary>
-        /// Activa el modo Placeholder si el control está vacío, aplicando el color y texto informativo.
-        /// </summary>
-        private void SetPlaceholder() {
-            if(string.IsNullOrWhiteSpace(textBox1.Text) && !string.IsNullOrEmpty(placeholderText)) {
-                isPlaceholder = true;
-                textBox1.Text = placeholderText;
-                textBox1.ForeColor = placeholderColor;
+        private void SetLogicalText(string value, bool updateEditor) {
+            string normalizedText = inputType == InputType.Numeric
+                ? SanitizeNumericText(value)
+                : value;
 
-                if(inputType == InputType.Password)
-                    textBox1.UseSystemPasswordChar = false;
+            bool hasChanged = base.Text != normalizedText;
+
+            if(updateEditor && textBox1 != null)
+                UpdateEditorPresentation(normalizedText);
+
+            if(!hasChanged)
+                return;
+
+            base.Text = normalizedText;
+            _TextChanged?.Invoke(this, EventArgs.Empty);
+            this.Invalidate();
+        }
+
+        private void UpdateEditorPresentation() {
+            UpdateEditorPresentation(base.Text ?? string.Empty);
+        }
+
+        private void UpdateEditorPresentation(string currentText) {
+            if(textBox1 == null)
+                return;
+
+            bool shouldShowPlaceholder = !isFocused
+                && currentText.Length == 0
+                && !string.IsNullOrEmpty(placeholderText);
+
+            isPlaceholder = shouldShowPlaceholder;
+            textBox1.ForeColor = shouldShowPlaceholder ? placeholderColor : mainForeColor;
+            textBox1.UseSystemPasswordChar = inputType == InputType.Password && !shouldShowPlaceholder;
+            SetEditorText(shouldShowPlaceholder ? placeholderText : currentText);
+        }
+
+        private void SetEditorText(string value) {
+            if(textBox1.Text == value)
+                return;
+
+            isUpdatingEditor = true;
+            try {
+                textBox1.Text = value;
+            } finally {
+                isUpdatingEditor = false;
             }
         }
 
-        /// <summary>
-        /// Elimina el Placeholder y restaura el formato de texto normal para permitir la escritura.
-        /// </summary>
-        private void RemovePlaceholder() {
-            if(isPlaceholder) {
-                isPlaceholder = false;
-                textBox1.Text = "";
-                textBox1.ForeColor = mainForeColor;
+        private static string SanitizeNumericText(string value) {
+            if(string.IsNullOrEmpty(value))
+                return string.Empty;
 
-                if(inputType == InputType.Password)
-                    textBox1.UseSystemPasswordChar = true;
+            char[] digits = new char[value.Length];
+            int digitCount = 0;
+
+            foreach(char character in value) {
+                if(char.IsDigit(character)) {
+                    digits[digitCount] = character;
+                    digitCount++;
+                }
             }
+
+            return new string(digits, 0, digitCount);
+        }
+
+        private static int CountDigitsBefore(string value, int position) {
+            int digitCount = 0;
+            int limit = Math.Min(position, value.Length);
+
+            for(int index = 0; index < limit; index++) {
+                if(char.IsDigit(value[index]))
+                    digitCount++;
+            }
+
+            return digitCount;
         }
 
         /// <summary>
@@ -318,6 +455,7 @@ namespace Sara_UI_Design.SaraControls {
             }
 
             this.Padding = new Padding(left, top, right, bottom);
+            UpdateControlHeight();
         }
 
         /// <summary>
@@ -326,35 +464,41 @@ namespace Sara_UI_Design.SaraControls {
         /// </summary>
         protected override void OnPaint(PaintEventArgs e) {
             base.OnPaint(e);
+            if(this.Width <= 2 || this.Height <= 2)
+                return;
+
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
-            Rectangle rectBorder = this.ClientRectangle;
+            Rectangle rectBorder = Rectangle.Inflate(this.ClientRectangle, -1, -1);
             Color currentBorder = isFocused ? borderFocusColor : borderColor;
 
             // 1. Dibujar el Borde (Redondeado o Subrayado)
-            using(Pen penBorder = new Pen(currentBorder, borderSize)) {
+            if(borderSize > 0) {
+                using Pen penBorder = new Pen(currentBorder, borderSize);
                 penBorder.Alignment = PenAlignment.Inset;
 
                 if(borderRadius > 1 && !underlinedStyle) {
                     using(GraphicsPath pathBorder = GetFigurePath(rectBorder, borderRadius)) {
-                        this.Region = new Region(pathBorder);
                         g.DrawPath(penBorder, pathBorder);
                     }
                 } else {
-                    this.Region = new Region(rectBorder);
                     if(underlinedStyle)
                         g.DrawLine(penBorder, 0, this.Height - 1, this.Width, this.Height - 1);
                     else
-                        g.DrawRectangle(penBorder, 0, 0, this.Width - 0.5F, this.Height - 0.5F);
+                        g.DrawRectangle(penBorder, rectBorder);
                 }
             }
 
             // 2. Dibujar el Icono desde la IconLibrary de forma dinámica
             if(!string.IsNullOrEmpty(iconName) && iconName != "None") {
-                int iconX = (iconLocation == SaraIconLocation.Left) ? 12 : this.Width - iconSize - 12;
-                int iconY = (this.Height - iconSize) / 2;
-                Rectangle iconRect = new Rectangle(iconX, iconY, iconSize, iconSize);
+                int availableIconSize = Math.Max(1, Math.Min(this.Width - 4, this.Height - 4));
+                int renderedIconSize = Math.Min(iconSize, availableIconSize);
+                int iconX = iconLocation == SaraIconLocation.Left
+                    ? 12
+                    : this.Width - renderedIconSize - 12;
+                int iconY = (this.Height - renderedIconSize) / 2;
+                Rectangle iconRect = new Rectangle(iconX, iconY, renderedIconSize, renderedIconSize);
 
                 Color currentIconColor = isFocused ? borderFocusColor : iconColor;
                 SaraUI_IconLibrary.DrawIcon(iconName, g, iconRect, currentIconColor);
@@ -363,7 +507,16 @@ namespace Sara_UI_Design.SaraControls {
 
         private GraphicsPath GetFigurePath(Rectangle rect, int radius) {
             GraphicsPath path = new GraphicsPath();
-            float curveSize = radius * 2F;
+            if(rect.Width <= 0 || rect.Height <= 0) {
+                return path;
+            }
+
+            float curveSize = Math.Min(radius * 2F, Math.Min(rect.Width, rect.Height));
+            if(curveSize <= 1F) {
+                path.AddRectangle(rect);
+                return path;
+            }
+
             path.StartFigure();
             path.AddArc(rect.X, rect.Y, curveSize, curveSize, 180, 90);
             path.AddArc(rect.Right - curveSize, rect.Y, curveSize, curveSize, 270, 90);
@@ -371,6 +524,23 @@ namespace Sara_UI_Design.SaraControls {
             path.AddArc(rect.X, rect.Bottom - curveSize, curveSize, curveSize, 90, 90);
             path.CloseFigure();
             return path;
+        }
+
+        private void UpdateControlRegion() {
+            if(this.Width <= 0 || this.Height <= 0)
+                return;
+
+            Region newRegion;
+            if(borderRadius > 1 && !underlinedStyle) {
+                using GraphicsPath path = GetFigurePath(this.ClientRectangle, borderRadius);
+                newRegion = new Region(path);
+            } else {
+                newRegion = new Region(this.ClientRectangle);
+            }
+
+            Region? previousRegion = this.Region;
+            this.Region = newRegion;
+            previousRegion?.Dispose();
         }
 
         /// <summary>
@@ -385,11 +555,27 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
+        /// <inheritdoc/>
         protected override void OnResize(EventArgs e) {
             base.OnResize(e);
-            if(this.DesignMode && inputType != InputType.Multiline) {
+            UpdateControlRegion();
+            if(textBox1 != null && this.DesignMode && inputType != InputType.Multiline) {
                 UpdateControlHeight();
             }
+        }
+
+        /// <inheritdoc/>
+        protected override void OnMouseDown(MouseEventArgs e) {
+            base.OnMouseDown(e);
+            textBox1.Focus();
+        }
+
+        /// <inheritdoc/>
+        protected override void OnClick(EventArgs e) {
+            if(!textBox1.Focused)
+                textBox1.Focus();
+
+            base.OnClick(e);
         }
     }
 }

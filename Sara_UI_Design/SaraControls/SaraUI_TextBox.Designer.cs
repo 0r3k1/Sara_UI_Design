@@ -39,7 +39,7 @@
             // 
             // SaraUI_TextBox
             // 
-            AutoScaleMode = AutoScaleMode.None;
+            AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Window;
             Controls.Add(textBox1);
             Name = "SaraUI_TextBox";
