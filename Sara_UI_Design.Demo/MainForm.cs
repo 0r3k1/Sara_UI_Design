@@ -19,7 +19,7 @@ namespace Sara_UI_Design.Demo {
                 new Size(520, 28));
 
             Label instructionsLabel = CreateLabel(
-                "Prueba los cambios de valor, el modo Marquee y el movimiento de un control WinForms normal.",
+                "Prueba el progreso, el movimiento de un control y la opacidad de la ventana.",
                 new Point(24, 56),
                 new Size(520, 44));
 
@@ -52,6 +52,8 @@ namespace Sara_UI_Design.Demo {
                 Size = new Size(36, 36)
             };
             motionTrack.Controls.Add(movingPanel);
+            controlTransitions.Target = movingPanel;
+            windowTransitions.Target = this;
 
             FlowLayoutPanel actionsPanel = new FlowLayoutPanel {
                 Location = new Point(24, 438),
@@ -66,10 +68,12 @@ namespace Sara_UI_Design.Demo {
             Button pauseButton = CreateActionButton("Pausar");
             Button resumeButton = CreateActionButton("Reanudar");
             Button stopButton = CreateActionButton("Detener");
+            Button fadeButton = CreateActionButton("Atenuar ventana");
 
             void UpdateStateLabel() {
                 stateLabel.Text =
-                    $"Panel: {motionAnimator.State} | Circular: {circularProgress.AnimationState}";
+                    $"Panel: {controlTransitions.State} | Circular: {circularProgress.AnimationState} | " +
+                    $"Ventana: {windowTransitions.State}";
             }
 
             void SetCircularValue(int value) {
@@ -96,10 +100,8 @@ namespace Sara_UI_Design.Demo {
                     ? rightDestination
                     : leftDestination;
 
-                motionAnimator.Start(
-                    movingPanel.Left,
-                    destination,
-                    value => movingPanel.Left = (int)Math.Round(value),
+                controlTransitions.MoveTo(
+                    new Point(destination, movingPanel.Top),
                     new SaraAnimationOptions {
                         AutoReverse = true,
                         Duration = 900,
@@ -107,22 +109,37 @@ namespace Sara_UI_Design.Demo {
                     });
             };
 
+            fadeButton.Click += (_, _) => {
+                double destination = Opacity > 0.85d ? 0.70d : 1d;
+
+                windowTransitions.FadeTo(
+                    destination,
+                    new SaraAnimationOptions {
+                        Duration = 450,
+                        Easing = SaraEasing.EaseInOutQuad
+                    });
+            };
+
             pauseButton.Click += (_, _) => {
-                motionAnimator.Pause();
+                controlTransitions.Pause();
+                windowTransitions.Pause();
                 circularProgress.PauseAnimation();
             };
 
             resumeButton.Click += (_, _) => {
-                motionAnimator.Resume();
+                controlTransitions.Resume();
+                windowTransitions.Resume();
                 circularProgress.ResumeAnimation();
             };
 
             stopButton.Click += (_, _) => {
-                motionAnimator.Stop();
+                controlTransitions.Stop();
+                windowTransitions.Stop();
                 circularProgress.StopAnimation();
             };
 
-            motionAnimator.StateChanged += (_, _) => UpdateStateLabel();
+            controlTransitions.StateChanged += (_, _) => UpdateStateLabel();
+            windowTransitions.StateChanged += (_, _) => UpdateStateLabel();
             circularProgress.AnimationStateChanged += (_, _) => UpdateStateLabel();
 
             actionsPanel.Controls.Add(value25Button);
@@ -132,9 +149,10 @@ namespace Sara_UI_Design.Demo {
             actionsPanel.Controls.Add(pauseButton);
             actionsPanel.Controls.Add(resumeButton);
             actionsPanel.Controls.Add(stopButton);
+            actionsPanel.Controls.Add(fadeButton);
 
             Label checklistLabel = CreateLabel(
-                "Verifica: transición suave, giro continuo, pausa sin saltos, reanudación desde el mismo punto y detención inmediata.",
+                "Verifica: movimiento y opacidad suaves, pausa sin saltos, reanudación desde el mismo punto y detención inmediata.",
                 new Point(24, 540),
                 new Size(520, 58));
 

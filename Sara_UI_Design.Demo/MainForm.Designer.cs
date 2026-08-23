@@ -24,7 +24,8 @@
         /// </summary>
         private void InitializeComponent() {
             components = new System.ComponentModel.Container();
-            motionAnimator = new Sara_UI_Design.Animations.SaraAnimator(components);
+            controlTransitions = new Sara_UI_Design.Animations.SaraControlTransitions(components);
+            windowTransitions = new Sara_UI_Design.Animations.SaraControlTransitions(components);
             sarauI_GridPanel1 = new Sara_UI_Design.SaraControls.SaraUI_GridPanel();
             panel2 = new Panel();
             panel1 = new Panel();
@@ -80,6 +81,7 @@
         private Sara_UI_Design.SaraControls.SaraUI_GridPanel sarauI_GridPanel1;
         private Panel panel2;
         private Panel panel1;
-        private Sara_UI_Design.Animations.SaraAnimator motionAnimator = null!;
+        private Sara_UI_Design.Animations.SaraControlTransitions controlTransitions = null!;
+        private Sara_UI_Design.Animations.SaraControlTransitions windowTransitions = null!;
     }
 }

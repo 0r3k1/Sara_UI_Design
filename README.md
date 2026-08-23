@@ -46,6 +46,23 @@ La biblioteca incorpora un motor propio compatible con ambos frameworks. El espa
 
 `SaraUI_CircularProgressBar` utiliza este motor para animar cambios de valor y el modo `Marquee`. La aplicación Demo también contiene una prueba de movimiento aplicada a un control estándar de Windows Forms.
 
+`SaraControlTransitions` permite animar posición, tamaño, límites, colores y opacidad de formularios con una API de alto nivel:
+
+```csharp
+SaraControlTransitions transitions = new SaraControlTransitions(components) {
+    Target = panelLogin
+};
+
+transitions.MoveTo(
+    new Point(80, 120),
+    new SaraAnimationOptions {
+        Duration = 600,
+        Easing = SaraEasing.EaseInOutCubic
+    });
+```
+
+Los controles posicionados mediante `Dock` y los tamaños administrados mediante `AutoSize` deben liberarse de esas reglas de diseño antes de animar su geometría.
+
 ## 🧪 Compilación y demostración
 
 La solución contiene dos proyectos:
