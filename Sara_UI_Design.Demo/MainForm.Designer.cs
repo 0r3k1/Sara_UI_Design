@@ -3,7 +3,7 @@
         /// <summary>
         ///  Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private System.ComponentModel.IContainer components = null!;
 
         /// <summary>
         ///  Clean up any resources being used.
@@ -23,13 +23,12 @@
         ///  the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            components = new System.ComponentModel.Container();
+            motionAnimator = new Sara_UI_Design.Animations.SaraAnimator(components);
             sarauI_GridPanel1 = new Sara_UI_Design.SaraControls.SaraUI_GridPanel();
             panel2 = new Panel();
             panel1 = new Panel();
-            sarauI_ComboBox1 = new Sara_UI_Design.SaraControls.SaraUI_ComboBox();
-            sarauI_ComboBox2 = new Sara_UI_Design.SaraControls.SaraUI_ComboBox();
             sarauI_GridPanel1.SuspendLayout();
-            panel1.SuspendLayout();
             SuspendLayout();
             // 
             // sarauI_GridPanel1
@@ -58,50 +57,10 @@
             // panel1
             // 
             panel1.BackColor = SystemColors.ActiveCaption;
-            panel1.Controls.Add(sarauI_ComboBox2);
-            panel1.Controls.Add(sarauI_ComboBox1);
             panel1.Location = new Point(10, 10);
             panel1.Name = "panel1";
             panel1.Size = new Size(585, 705);
             panel1.TabIndex = 0;
-            // 
-            // sarauI_ComboBox1
-            // 
-            sarauI_ComboBox1.BorderColor = Color.MediumSlateBlue;
-            sarauI_ComboBox1.BorderFocusColor = Color.HotPink;
-            sarauI_ComboBox1.BorderSize = 2;
-            sarauI_ComboBox1.DropDownStyle = ComboBoxStyle.DropDown;
-            sarauI_ComboBox1.Font = new Font("Segoe UI", 10F);
-            sarauI_ComboBox1.ForeColor = Color.DimGray;
-            sarauI_ComboBox1.IconColor = Color.MediumSlateBlue;
-            sarauI_ComboBox1.ListBackColor = Color.FromArgb(230, 228, 245);
-            sarauI_ComboBox1.ListTextColor = Color.DimGray;
-            sarauI_ComboBox1.Location = new Point(27, 22);
-            sarauI_ComboBox1.MinimumSize = new Size(200, 30);
-            sarauI_ComboBox1.Name = "sarauI_ComboBox1";
-            sarauI_ComboBox1.Padding = new Padding(2);
-            sarauI_ComboBox1.Size = new Size(258, 30);
-            sarauI_ComboBox1.TabIndex = 0;
-            sarauI_ComboBox1.Texts = "";
-            // 
-            // sarauI_ComboBox2
-            // 
-            sarauI_ComboBox2.BorderColor = Color.MediumSlateBlue;
-            sarauI_ComboBox2.BorderFocusColor = Color.HotPink;
-            sarauI_ComboBox2.BorderSize = 2;
-            sarauI_ComboBox2.DropDownStyle = ComboBoxStyle.DropDown;
-            sarauI_ComboBox2.Font = new Font("Segoe UI", 10F);
-            sarauI_ComboBox2.ForeColor = Color.DimGray;
-            sarauI_ComboBox2.IconColor = Color.MediumSlateBlue;
-            sarauI_ComboBox2.ListBackColor = Color.FromArgb(230, 228, 245);
-            sarauI_ComboBox2.ListTextColor = Color.DimGray;
-            sarauI_ComboBox2.Location = new Point(124, 117);
-            sarauI_ComboBox2.MinimumSize = new Size(200, 30);
-            sarauI_ComboBox2.Name = "sarauI_ComboBox2";
-            sarauI_ComboBox2.Padding = new Padding(2);
-            sarauI_ComboBox2.Size = new Size(200, 30);
-            sarauI_ComboBox2.TabIndex = 1;
-            sarauI_ComboBox2.Texts = "";
             // 
             // MainForm
             // 
@@ -113,7 +72,6 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Sara UI Design - Demostración";
             sarauI_GridPanel1.ResumeLayout(false);
-            panel1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -122,7 +80,6 @@
         private Sara_UI_Design.SaraControls.SaraUI_GridPanel sarauI_GridPanel1;
         private Panel panel2;
         private Panel panel1;
-        private Sara_UI_Design.SaraControls.SaraUI_ComboBox sarauI_ComboBox1;
-        private Sara_UI_Design.SaraControls.SaraUI_ComboBox sarauI_ComboBox2;
+        private Sara_UI_Design.Animations.SaraAnimator motionAnimator = null!;
     }
 }

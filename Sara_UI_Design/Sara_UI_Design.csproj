@@ -23,8 +23,6 @@
 	<ItemGroup>
 		<None Include="logo.png" Pack="true" PackagePath="\" />
 		<None Include="..\README.md" Pack="true" PackagePath="\" Link="README.md" />
-
-		<PackageReference Include="WinFormAnimation" Version="1.6.0.4" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">

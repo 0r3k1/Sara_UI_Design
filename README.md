@@ -38,9 +38,13 @@ También puedes buscar `Sara_UI_Design` desde el administrador de paquetes NuGet
 
 - Windows.
 - Windows Forms sobre .NET 8 (`net8.0-windows`) o .NET Framework 4.8 (`net48`).
-- `WinFormAnimation 1.6.0.4` para los controles que todavía utilizan animaciones.
+- No requiere bibliotecas externas para sus animaciones.
 
-La dependencia `WinFormAnimation` será reemplazada progresivamente por un motor de animaciones propio.
+## 🎬 Motor de animaciones
+
+La biblioteca incorpora un motor propio compatible con ambos frameworks. El espacio de nombres `Sara_UI_Design.Animations` incluye interpolación numérica, curvas de aceleración, pausa, reanudación, cancelación, repetición y reversa automática.
+
+`SaraUI_CircularProgressBar` utiliza este motor para animar cambios de valor y el modo `Marquee`. La aplicación Demo también contiene una prueba de movimiento aplicada a un control estándar de Windows Forms.
 
 ## 🧪 Compilación y demostración
 

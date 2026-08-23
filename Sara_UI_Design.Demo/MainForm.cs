@@ -1,10 +1,152 @@
+using Sara_UI_Design.Animations;
 using Sara_UI_Design.SaraControls;
 
 namespace Sara_UI_Design.Demo {
     public partial class MainForm:Form {
         public MainForm() {
             InitializeComponent();
+            ConfigureAnimationExamples();
             ConfigureTextBoxExamples();
+        }
+
+        private void ConfigureAnimationExamples() {
+            panel1.BackColor = Color.White;
+            panel1.Padding = new Padding(24);
+
+            Label titleLabel = CreateLabel(
+                "Pruebas del motor de animaciones",
+                new Point(24, 24),
+                new Size(520, 28));
+
+            Label instructionsLabel = CreateLabel(
+                "Prueba los cambios de valor, el modo Marquee y el movimiento de un control WinForms normal.",
+                new Point(24, 56),
+                new Size(520, 44));
+
+            SaraUI_CircularProgressBar circularProgress = new SaraUI_CircularProgressBar {
+                AnimationFunction = SaraEasing.EaseInOutCubic,
+                AnimationSpeed = 700,
+                Location = new Point(194, 108),
+                MarqueeAnimationDuration = 1600,
+                Size = new Size(196, 196),
+                SubscriptText = string.Empty,
+                Text = "20",
+                Value = 20
+            };
+
+            Label stateLabel = CreateLabel(
+                string.Empty,
+                new Point(24, 314),
+                new Size(520, 28));
+            stateLabel.TextAlign = ContentAlignment.MiddleCenter;
+
+            Panel motionTrack = new Panel {
+                BackColor = Color.FromArgb(238, 238, 248),
+                Location = new Point(24, 352),
+                Size = new Size(520, 70)
+            };
+
+            Panel movingPanel = new Panel {
+                BackColor = Color.MediumSlateBlue,
+                Location = new Point(16, 17),
+                Size = new Size(36, 36)
+            };
+            motionTrack.Controls.Add(movingPanel);
+
+            FlowLayoutPanel actionsPanel = new FlowLayoutPanel {
+                Location = new Point(24, 438),
+                Size = new Size(520, 86),
+                WrapContents = true
+            };
+
+            Button value25Button = CreateActionButton("Valor 25");
+            Button value80Button = CreateActionButton("Valor 80");
+            Button marqueeButton = CreateActionButton("Marquee");
+            Button moveButton = CreateActionButton("Mover panel");
+            Button pauseButton = CreateActionButton("Pausar");
+            Button resumeButton = CreateActionButton("Reanudar");
+            Button stopButton = CreateActionButton("Detener");
+
+            void UpdateStateLabel() {
+                stateLabel.Text =
+                    $"Panel: {motionAnimator.State} | Circular: {circularProgress.AnimationState}";
+            }
+
+            void SetCircularValue(int value) {
+                if(circularProgress.Style == ProgressBarStyle.Marquee) {
+                    circularProgress.Style = ProgressBarStyle.Continuous;
+                }
+
+                circularProgress.Text = value.ToString();
+                circularProgress.Value = value;
+            }
+
+            value25Button.Click += (_, _) => SetCircularValue(25);
+            value80Button.Click += (_, _) => SetCircularValue(80);
+            marqueeButton.Click += (_, _) => {
+                circularProgress.Style = circularProgress.Style == ProgressBarStyle.Marquee
+                    ? ProgressBarStyle.Continuous
+                    : ProgressBarStyle.Marquee;
+            };
+
+            moveButton.Click += (_, _) => {
+                int leftDestination = 16;
+                int rightDestination = motionTrack.ClientSize.Width - movingPanel.Width - 16;
+                int destination = movingPanel.Left < motionTrack.ClientSize.Width / 2
+                    ? rightDestination
+                    : leftDestination;
+
+                motionAnimator.Start(
+                    movingPanel.Left,
+                    destination,
+                    value => movingPanel.Left = (int)Math.Round(value),
+                    new SaraAnimationOptions {
+                        AutoReverse = true,
+                        Duration = 900,
+                        Easing = SaraEasing.EaseInOutCubic
+                    });
+            };
+
+            pauseButton.Click += (_, _) => {
+                motionAnimator.Pause();
+                circularProgress.PauseAnimation();
+            };
+
+            resumeButton.Click += (_, _) => {
+                motionAnimator.Resume();
+                circularProgress.ResumeAnimation();
+            };
+
+            stopButton.Click += (_, _) => {
+                motionAnimator.Stop();
+                circularProgress.StopAnimation();
+            };
+
+            motionAnimator.StateChanged += (_, _) => UpdateStateLabel();
+            circularProgress.AnimationStateChanged += (_, _) => UpdateStateLabel();
+
+            actionsPanel.Controls.Add(value25Button);
+            actionsPanel.Controls.Add(value80Button);
+            actionsPanel.Controls.Add(marqueeButton);
+            actionsPanel.Controls.Add(moveButton);
+            actionsPanel.Controls.Add(pauseButton);
+            actionsPanel.Controls.Add(resumeButton);
+            actionsPanel.Controls.Add(stopButton);
+
+            Label checklistLabel = CreateLabel(
+                "Verifica: transición suave, giro continuo, pausa sin saltos, reanudación desde el mismo punto y detención inmediata.",
+                new Point(24, 540),
+                new Size(520, 58));
+
+            panel1.Controls.Add(titleLabel);
+            panel1.Controls.Add(instructionsLabel);
+            panel1.Controls.Add(circularProgress);
+            panel1.Controls.Add(stateLabel);
+            panel1.Controls.Add(motionTrack);
+            panel1.Controls.Add(actionsPanel);
+            panel1.Controls.Add(checklistLabel);
+
+            UpdateStateLabel();
         }
 
         private void ConfigureTextBoxExamples() {
@@ -88,6 +230,15 @@ namespace Sara_UI_Design.Demo {
                 Location = location,
                 Size = size,
                 Text = text
+            };
+        }
+
+        private static Button CreateActionButton(string text) {
+            return new Button {
+                Margin = new Padding(3),
+                Size = new Size(120, 34),
+                Text = text,
+                UseVisualStyleBackColor = true
             };
         }
 
