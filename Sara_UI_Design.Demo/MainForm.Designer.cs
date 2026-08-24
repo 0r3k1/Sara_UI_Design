@@ -69,6 +69,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1190, 725);
             Controls.Add(sarauI_GridPanel1);
+            Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Sara UI Design - Demostración";
