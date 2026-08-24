@@ -14,6 +14,7 @@ Una biblioteca de controles personalizados para **Windows Forms sobre .NET**, en
 - **SaraUI_PictureBox**: imágenes circulares con bordes degradados.
 - **SaraUI_RadioButton**: botón de opción con efectos visuales.
 - **SaraUI_Line**: separador horizontal o vertical.
+- **SaraUI_SideBar**: barra lateral expandible con animaciones temporales y estados observables.
 
 ## 🚀 Instalación
 
@@ -62,6 +63,17 @@ transitions.MoveTo(
 ```
 
 Los controles posicionados mediante `Dock` y los tamaños administrados mediante `AutoSize` deben liberarse de esas reglas de diseño antes de animar su geometría.
+
+`SaraUI_SideBar` utiliza directamente el motor propio para expandirse y contraerse. Su configuración se expresa en tiempo real y no en píxeles por fotograma:
+
+```csharp
+sideBar.AnimationDuration = 450;
+sideBar.AnimationEasing = SaraEasing.EaseInOutCubic;
+sideBar.AutoHideButtonText = true;
+sideBar.Toggle();
+```
+
+La barra también permite pausar, reanudar y detener una transición. Los textos ocultos de los botones se conservan internamente sin modificar su propiedad `Tag`.
 
 ## 🧪 Compilación y demostración
 

@@ -7,6 +7,7 @@ namespace Sara_UI_Design.Demo {
             InitializeComponent();
             ConfigureAnimationExamples();
             ConfigureTextBoxExamples();
+            ConfigureSideBarExamples();
         }
 
         private void ConfigureAnimationExamples() {
@@ -228,6 +229,84 @@ namespace Sara_UI_Design.Demo {
             panel2.Controls.Add(clearButton);
         }
 
+        private void ConfigureSideBarExamples() {
+            Label titleLabel = CreateLabel(
+                "Pruebas de SaraUI_SideBar",
+                new Point(24, 520),
+                new Size(520, 28));
+
+            Panel sideBarHost = new Panel {
+                BackColor = Color.FromArgb(238, 238, 248),
+                Location = new Point(24, 552),
+                Size = new Size(520, 128)
+            };
+
+            SaraUI_SideBar sideBar = new SaraUI_SideBar {
+                AnimationDuration = 500,
+                AnimationEasing = SaraEasing.EaseInOutCubic,
+                BackColor = Color.FromArgb(45, 45, 65),
+                CollapsedWidth = 64,
+                ExpandedWidth = 230
+            };
+
+            SaraUI_Button homeButton = CreateSideBarButton("Inicio", "Dashboard", new Point(8, 14));
+            SaraUI_Button settingsButton = CreateSideBarButton("Ajustes", "Settings", new Point(8, 64));
+            sideBar.Controls.Add(homeButton);
+            sideBar.Controls.Add(settingsButton);
+
+            Label stateLabel = CreateLabel(
+                string.Empty,
+                new Point(250, 12),
+                new Size(260, 26));
+
+            Button toggleButton = CreateActionButton("Alternar");
+            toggleButton.Location = new Point(250, 43);
+
+            Button pauseButton = CreateActionButton("Pausar");
+            pauseButton.Location = new Point(376, 43);
+
+            Button resumeButton = CreateActionButton("Reanudar");
+            resumeButton.Location = new Point(250, 83);
+
+            Button stopButton = CreateActionButton("Detener");
+            stopButton.Location = new Point(376, 83);
+
+            void ResizeMenuButtons() {
+                int buttonWidth = Math.Max(1, sideBar.ClientSize.Width - 16);
+                homeButton.Width = buttonWidth;
+                settingsButton.Width = buttonWidth;
+            }
+
+            void UpdateStateLabel() {
+                string destination = sideBar.IsExpanded ? "Expandida" : "Contraída";
+                stateLabel.Text = $"{destination} | {sideBar.AnimationState} | {sideBar.Width}px";
+            }
+
+            sideBar.SizeChanged += (_, _) => {
+                ResizeMenuButtons();
+                UpdateStateLabel();
+            };
+            sideBar.IsExpandedChanged += (_, _) => UpdateStateLabel();
+            sideBar.AnimationStateChanged += (_, _) => UpdateStateLabel();
+
+            toggleButton.Click += (_, _) => sideBar.Toggle();
+            pauseButton.Click += (_, _) => sideBar.PauseAnimation();
+            resumeButton.Click += (_, _) => sideBar.ResumeAnimation();
+            stopButton.Click += (_, _) => sideBar.StopAnimation();
+
+            sideBarHost.Controls.Add(sideBar);
+            sideBarHost.Controls.Add(stateLabel);
+            sideBarHost.Controls.Add(toggleButton);
+            sideBarHost.Controls.Add(pauseButton);
+            sideBarHost.Controls.Add(resumeButton);
+            sideBarHost.Controls.Add(stopButton);
+            panel2.Controls.Add(titleLabel);
+            panel2.Controls.Add(sideBarHost);
+
+            ResizeMenuButtons();
+            UpdateStateLabel();
+        }
+
         private static SaraUI_TextBox CreateTextBox(string placeholder, string iconName, Point location) {
             return new SaraUI_TextBox {
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
@@ -257,6 +336,18 @@ namespace Sara_UI_Design.Demo {
                 Size = new Size(120, 34),
                 Text = text,
                 UseVisualStyleBackColor = true
+            };
+        }
+
+        private static SaraUI_Button CreateSideBarButton(string text, string iconName, Point location) {
+            return new SaraUI_Button {
+                BackColor = Color.FromArgb(45, 45, 65),
+                BorderRadius = 8,
+                ForeColor = Color.White,
+                IconName = iconName,
+                Location = location,
+                Size = new Size(214, 38),
+                Text = text
             };
         }
 
