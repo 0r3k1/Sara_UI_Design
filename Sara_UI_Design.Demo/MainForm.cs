@@ -6,6 +6,7 @@ namespace Sara_UI_Design.Demo {
         public MainForm() {
             InitializeComponent();
             ConfigureAnimationExamples();
+            ConfigureButtonExamples();
             ConfigureTextBoxExamples();
             ConfigureSideBarExamples();
         }
@@ -164,6 +165,101 @@ namespace Sara_UI_Design.Demo {
             panel1.Controls.Add(motionTrack);
             panel1.Controls.Add(actionsPanel);
             panel1.Controls.Add(checklistLabel);
+
+            UpdateStateLabel();
+        }
+
+        private void ConfigureButtonExamples() {
+            Label titleLabel = CreateLabel(
+                "SaraUI_Button: ratón, foco, teclado y estado deshabilitado",
+                new Point(24, 606),
+                new Size(520, 26));
+
+            SaraUI_Button saveButton = new SaraUI_Button {
+                AccessibleDescription = "Guarda los datos de la demostración.",
+                AccessibleName = "Guardar datos",
+                AnimationDuration = 180,
+                BackColor = Color.MediumSlateBlue,
+                BorderColor = Color.MediumSlateBlue,
+                BorderRadius = 12,
+                BorderSize = 1,
+                FocusBorderColor = Color.HotPink,
+                ForeColor = Color.White,
+                HoverBackColor = Color.SlateBlue,
+                IconColor = Color.MistyRose,
+                IconName = "Check",
+                Location = new Point(24, 638),
+                PressedBackColor = Color.DarkSlateBlue,
+                Size = new Size(138, 42),
+                TabIndex = 0,
+                Text = "&Guardar"
+            };
+
+            SaraUI_Button deleteButton = new SaraUI_Button {
+                AccessibleDescription = "Elimina el elemento seleccionado de la demostración.",
+                AccessibleName = "Eliminar elemento",
+                AnimationDuration = 180,
+                BackColor = Color.White,
+                BorderColor = Color.Firebrick,
+                BorderRadius = 12,
+                BorderSize = 1,
+                FocusBorderColor = Color.HotPink,
+                ForeColor = Color.Firebrick,
+                HoverBackColor = Color.MistyRose,
+                IconLocation = SaraUI_Button.SaraIconLocation.Right,
+                IconName = "Trash",
+                Location = new Point(174, 638),
+                Padding = new Padding(10, 0, 10, 0),
+                PressedBackColor = Color.FromArgb(244, 198, 204),
+                Size = new Size(138, 42),
+                TabIndex = 1,
+                Text = "&Eliminar",
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+
+            CheckBox disableCheckBox = new CheckBox {
+                AutoSize = true,
+                Location = new Point(326, 638),
+                TabIndex = 2,
+                Text = "Deshabilitar Guardar"
+            };
+
+            Label stateLabel = CreateLabel(
+                string.Empty,
+                new Point(326, 658),
+                new Size(218, 24));
+
+            SaraUI_Button activeButton = saveButton;
+
+            void UpdateStateLabel() {
+                stateLabel.Text = $"{activeButton.Text.Replace("&", string.Empty)}: " +
+                    $"{activeButton.VisualState} | {activeButton.AnimationState}";
+            }
+
+            void ObserveButton(SaraUI_Button button) {
+                button.VisualStateChanged += (_, _) => {
+                    activeButton = button;
+                    UpdateStateLabel();
+                };
+                button.AnimationStateChanged += (_, _) => {
+                    activeButton = button;
+                    UpdateStateLabel();
+                };
+            }
+
+            ObserveButton(saveButton);
+            ObserveButton(deleteButton);
+            disableCheckBox.CheckedChanged += (_, _) => {
+                saveButton.Enabled = !disableCheckBox.Checked;
+                activeButton = saveButton;
+                UpdateStateLabel();
+            };
+
+            panel1.Controls.Add(titleLabel);
+            panel1.Controls.Add(saveButton);
+            panel1.Controls.Add(deleteButton);
+            panel1.Controls.Add(disableCheckBox);
+            panel1.Controls.Add(stateLabel);
 
             UpdateStateLabel();
         }

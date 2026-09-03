@@ -6,7 +6,7 @@ Una biblioteca de controles personalizados para **Windows Forms sobre .NET**, en
 
 - **SaraUI_FlexPanel**: panel con lógica inspirada en CSS Flexbox.
 - **SaraUI_ShadowPanel**: panel con sombras proyectadas y bordes redondeados.
-- **SaraUI_Button**: botón estilizado con soporte para bordes redondeados.
+- **SaraUI_Button**: botón con iconos, estados visuales accesibles y transiciones de color.
 - **SaraUI_TextBox**: entrada con placeholder, validación e iconos.
 - **SaraUI_CircularProgressBar**: progreso circular animado.
 - **SaraUI_ToggleButton**: interruptor moderno de encendido y apagado.
@@ -74,6 +74,19 @@ sideBar.Toggle();
 ```
 
 La barra también permite pausar, reanudar y detener una transición. Los textos ocultos de los botones se conservan internamente sin modificar su propiedad `Tag`.
+
+`SaraUI_Button` incorpora estados observables para interacción con ratón, teclado, foco y modo deshabilitado. Las transiciones utilizan `SaraAnimator`, y `Color.Empty` permite conservar valores automáticos compatibles con la versión anterior:
+
+```csharp
+saveButton.IconName = "Check";
+saveButton.IconColor = Color.MistyRose;
+saveButton.HoverBackColor = Color.SlateBlue;
+saveButton.PressedBackColor = Color.DarkSlateBlue;
+saveButton.FocusBorderColor = Color.HotPink;
+saveButton.AnimationDuration = 180;
+```
+
+El botón también respeta `Padding`, `TextAlign`, `RightToLeft`, mnemónicos, elipsis y la guía de foco estándar. Sus propiedades heredadas `AccessibleName`, `AccessibleDescription` y `TabIndex` deben configurarse según el formulario.
 
 ## 🧪 Compilación y demostración
 
