@@ -9,6 +9,7 @@ Una biblioteca de controles personalizados para **Windows Forms sobre .NET**, en
 - **SaraUI_Button**: botón con iconos, estados visuales accesibles y transiciones de color.
 - **SaraUI_TextBox**: entrada con placeholder, validación e iconos.
 - **SaraUI_CircularProgressBar**: progreso circular animado.
+- **SaraUI_ProgressBar**: progreso lineal determinado o Marquee con texto y degradado.
 - **SaraUI_ToggleButton**: interruptor moderno de encendido y apagado.
 - **SaraUI_ComboBox**: lista desplegable personalizable.
 - **SaraUI_PictureBox**: imágenes circulares con bordes degradados.
@@ -45,7 +46,7 @@ También puedes buscar `Sara_UI_Design` desde el administrador de paquetes NuGet
 
 La biblioteca incorpora un motor propio compatible con ambos frameworks. El espacio de nombres `Sara_UI_Design.Animations` incluye interpolación numérica, curvas de aceleración, pausa, reanudación, cancelación, repetición y reversa automática.
 
-`SaraUI_CircularProgressBar` utiliza este motor para animar cambios de valor y el modo `Marquee`. La aplicación Demo también contiene una prueba de movimiento aplicada a un control estándar de Windows Forms.
+`SaraUI_CircularProgressBar` y `SaraUI_ProgressBar` utilizan este motor para animar cambios de valor y el modo `Marquee`. La aplicación Demo permite compararlos bajo las mismas órdenes y también contiene una prueba de movimiento aplicada a un control estándar de Windows Forms.
 
 `SaraControlTransitions` permite animar posición, tamaño, límites, colores y opacidad de formularios con una API de alto nivel:
 
@@ -87,6 +88,18 @@ saveButton.AnimationDuration = 180;
 ```
 
 El botón también respeta `Padding`, `TextAlign`, `RightToLeft`, mnemónicos, elipsis y la guía de foco estándar. Sus propiedades heredadas `AccessibleName`, `AccessibleDescription` y `TabIndex` deben configurarse según el formulario.
+
+`SaraUI_ProgressBar` separa el valor lógico solicitado del valor interpolado que se está dibujando. Admite progreso determinado, segmento indeterminado, degradado, texto deslizante y dirección de derecha a izquierda:
+
+```csharp
+progressBar.AnimationDuration = 700;
+progressBar.AnimationEasing = SaraEasing.EaseInOutCubic;
+progressBar.ShowValue = TextPosition.Sliding;
+progressBar.SymbolAfter = "%";
+progressBar.Value = 80;
+```
+
+La animación puede pausarse, reanudarse o detenerse con `PauseAnimation`, `ResumeAnimation` y `StopAnimation`. La propiedad `DisplayedValue` permite observar el avance visual, mientras `Value` conserva inmediatamente el destino lógico. El nombre histórico `ShowMaximun` continúa disponible para compatibilidad; el código nuevo debe utilizar `ShowMaximum`.
 
 ## 🧪 Compilación y demostración
 

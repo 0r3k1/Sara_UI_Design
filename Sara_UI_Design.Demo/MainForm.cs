@@ -21,36 +21,56 @@ namespace Sara_UI_Design.Demo {
                 new Size(520, 28));
 
             Label instructionsLabel = CreateLabel(
-                "Prueba el progreso, el movimiento de un control y la opacidad de la ventana.",
+                "Compara el progreso circular y lineal, el movimiento de un control y la opacidad de la ventana.",
                 new Point(24, 56),
                 new Size(520, 44));
 
             SaraUI_CircularProgressBar circularProgress = new SaraUI_CircularProgressBar {
                 AnimationFunction = SaraEasing.EaseInOutCubic,
                 AnimationSpeed = 700,
-                Location = new Point(194, 108),
+                Location = new Point(209, 100),
                 MarqueeAnimationDuration = 1600,
-                Size = new Size(196, 196),
+                Size = new Size(150, 150),
                 SubscriptText = string.Empty,
                 Text = "20",
                 Value = 20
             };
 
+            SaraUI_ProgressBar linearProgress = new SaraUI_ProgressBar {
+                AccessibleDescription = "Representa el mismo valor que el progreso circular.",
+                AccessibleName = "Progreso lineal de la demostración",
+                AnimationDuration = 700,
+                AnimationEasing = SaraEasing.EaseInOutCubic,
+                ChannelColor = Color.FromArgb(230, 230, 240),
+                ChannelHeight = 10,
+                ForeColor = Color.FromArgb(64, 64, 64),
+                Location = new Point(24, 296),
+                MarqueeAnimationDuration = 1600,
+                MarqueeSegmentPercentage = 28,
+                ShowValue = TextPosition.Sliding,
+                Size = new Size(520, 38),
+                SliderColor = Color.MediumSlateBlue,
+                SliderColorEnd = Color.HotPink,
+                SliderHeight = 14,
+                SymbolAfter = "%",
+                Value = 20
+            };
+
             Label stateLabel = CreateLabel(
                 string.Empty,
-                new Point(24, 314),
-                new Size(520, 28));
+                new Point(24, 252),
+                new Size(520, 38));
             stateLabel.TextAlign = ContentAlignment.MiddleCenter;
 
             Panel motionTrack = new Panel {
                 BackColor = Color.FromArgb(238, 238, 248),
-                Location = new Point(24, 352),
-                Size = new Size(520, 70)
+                Location = new Point(24, 344),
+                Size = new Size(520, 68)
             };
 
             Panel movingPanel = new Panel {
                 BackColor = Color.MediumSlateBlue,
-                Location = new Point(16, 17),
+                Location = new Point(16, 16),
                 Size = new Size(36, 36)
             };
             motionTrack.Controls.Add(movingPanel);
@@ -58,7 +78,7 @@ namespace Sara_UI_Design.Demo {
             windowTransitions.Target = this;
 
             FlowLayoutPanel actionsPanel = new FlowLayoutPanel {
-                Location = new Point(24, 438),
+                Location = new Point(24, 422),
                 Size = new Size(520, 86),
                 WrapContents = true
             };
@@ -74,25 +94,36 @@ namespace Sara_UI_Design.Demo {
 
             void UpdateStateLabel() {
                 stateLabel.Text =
-                    $"Panel: {controlTransitions.State} | Circular: {circularProgress.AnimationState} | " +
-                    $"Ventana: {windowTransitions.State}";
+                    $"Circular: {circularProgress.AnimationState} | Lineal: {linearProgress.AnimationState} " +
+                    $"({linearProgress.DisplayedValue:0})\n" +
+                    $"Panel: {controlTransitions.State} | Ventana: {windowTransitions.State}";
             }
 
-            void SetCircularValue(int value) {
+            void SetProgressValue(int value) {
                 if(circularProgress.Style == ProgressBarStyle.Marquee) {
                     circularProgress.Style = ProgressBarStyle.Continuous;
                 }
 
+                if(linearProgress.Style == ProgressBarStyle.Marquee) {
+                    linearProgress.Style = ProgressBarStyle.Continuous;
+                }
+
                 circularProgress.Text = value.ToString();
                 circularProgress.Value = value;
+                linearProgress.Value = value;
             }
 
-            value25Button.Click += (_, _) => SetCircularValue(25);
-            value80Button.Click += (_, _) => SetCircularValue(80);
+            value25Button.Click += (_, _) => SetProgressValue(25);
+            value80Button.Click += (_, _) => SetProgressValue(80);
             marqueeButton.Click += (_, _) => {
-                circularProgress.Style = circularProgress.Style == ProgressBarStyle.Marquee
-                    ? ProgressBarStyle.Continuous
-                    : ProgressBarStyle.Marquee;
+                ProgressBarStyle destinationStyle =
+                    circularProgress.Style == ProgressBarStyle.Marquee &&
+                    linearProgress.Style == ProgressBarStyle.Marquee
+                        ? ProgressBarStyle.Continuous
+                        : ProgressBarStyle.Marquee;
+
+                circularProgress.Style = destinationStyle;
+                linearProgress.Style = destinationStyle;
             };
 
             moveButton.Click += (_, _) => {
@@ -126,23 +157,27 @@ namespace Sara_UI_Design.Demo {
                 controlTransitions.Pause();
                 windowTransitions.Pause();
                 circularProgress.PauseAnimation();
+                linearProgress.PauseAnimation();
             };
 
             resumeButton.Click += (_, _) => {
                 controlTransitions.Resume();
                 windowTransitions.Resume();
                 circularProgress.ResumeAnimation();
+                linearProgress.ResumeAnimation();
             };
 
             stopButton.Click += (_, _) => {
                 controlTransitions.Stop();
                 windowTransitions.Stop();
                 circularProgress.StopAnimation();
+                linearProgress.StopAnimation();
             };
 
             controlTransitions.StateChanged += (_, _) => UpdateStateLabel();
             windowTransitions.StateChanged += (_, _) => UpdateStateLabel();
             circularProgress.AnimationStateChanged += (_, _) => UpdateStateLabel();
+            linearProgress.AnimationStateChanged += (_, _) => UpdateStateLabel();
 
             actionsPanel.Controls.Add(value25Button);
             actionsPanel.Controls.Add(value80Button);
@@ -154,14 +189,15 @@ namespace Sara_UI_Design.Demo {
             actionsPanel.Controls.Add(fadeButton);
 
             Label checklistLabel = CreateLabel(
-                "Verifica: movimiento y opacidad suaves, pausa sin saltos, reanudación desde el mismo punto y detención inmediata.",
-                new Point(24, 540),
-                new Size(520, 58));
+                "Verifica: ambos progresos deben coincidir; movimiento y opacidad suaves; pausa sin saltos; reanudación desde el mismo punto y detención inmediata.",
+                new Point(24, 516),
+                new Size(520, 78));
 
             panel1.Controls.Add(titleLabel);
             panel1.Controls.Add(instructionsLabel);
             panel1.Controls.Add(circularProgress);
             panel1.Controls.Add(stateLabel);
+            panel1.Controls.Add(linearProgress);
             panel1.Controls.Add(motionTrack);
             panel1.Controls.Add(actionsPanel);
             panel1.Controls.Add(checklistLabel);
