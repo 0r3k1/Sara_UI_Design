@@ -10,7 +10,7 @@ Una biblioteca de controles personalizados para **Windows Forms sobre .NET**, en
 - **SaraUI_TextBox**: entrada con placeholder, validación e iconos.
 - **SaraUI_CircularProgressBar**: progreso circular animado.
 - **SaraUI_ProgressBar**: progreso lineal determinado o Marquee con texto y degradado.
-- **SaraUI_ToggleButton**: interruptor moderno de encendido y apagado.
+- **SaraUI_ToggleButton**: interruptor animado con estados de interacción y soporte de tres estados.
 - **SaraUI_ComboBox**: lista desplegable personalizable.
 - **SaraUI_PictureBox**: imágenes circulares con bordes degradados.
 - **SaraUI_RadioButton**: botón de opción con efectos visuales.
@@ -88,6 +88,18 @@ saveButton.AnimationDuration = 180;
 ```
 
 El botón también respeta `Padding`, `TextAlign`, `RightToLeft`, mnemónicos, elipsis y la guía de foco estándar. Sus propiedades heredadas `AccessibleName`, `AccessibleDescription` y `TabIndex` deben configurarse según el formulario.
+
+`SaraUI_ToggleButton` representa `Unchecked`, `Checked` e `Indeterminate` mediante una transición continua del indicador y los colores. También distingue hover, presión, foco y estado deshabilitado:
+
+```csharp
+notificationsToggle.ThreeState = true;
+notificationsToggle.AnimationDuration = 220;
+notificationsToggle.AnimationEasing = SaraEasing.EaseInOutCubic;
+notificationsToggle.IndeterminateBackColor = Color.DarkGoldenrod;
+notificationsToggle.Checked = true;
+```
+
+El interruptor conserva el evento estándar `CheckedChanged` y agrega estado visual observable, eventos de animación, pausa, reanudación y detención. Cuando `ThreeState` está activo, utilice `CheckStateChanged` para distinguir también el estado indeterminado. `Text` se almacena para accesibilidad y automatización, pero no se dibuja dentro de su superficie compacta; configure además `AccessibleName` y `AccessibleDescription` según el formulario.
 
 `SaraUI_ProgressBar` separa el valor lógico solicitado del valor interpolado que se está dibujando. Admite progreso determinado, segmento indeterminado, degradado, texto deslizante y dirección de derecha a izquierda:
 

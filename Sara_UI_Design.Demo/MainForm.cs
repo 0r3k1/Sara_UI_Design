@@ -305,12 +305,12 @@ namespace Sara_UI_Design.Demo {
             panel2.Padding = new Padding(24);
 
             Label titleLabel = CreateLabel(
-                "Pruebas de SaraUI_TextBox",
+                "Pruebas de SaraUI_TextBox y SaraUI_ToggleButton",
                 new Point(24, 24),
                 new Size(520, 28));
 
             Label instructionsLabel = CreateLabel(
-                "Los contadores deben avanzar juntos y no cambiar al enfocar o abandonar el control.",
+                "Los contadores deben avanzar juntos. El interruptor controla la entrada numérica y admite tres estados.",
                 new Point(24, 56),
                 new Size(520, 42));
 
@@ -351,6 +351,53 @@ namespace Sara_UI_Design.Demo {
             };
             clearButton.Click += (_, _) => textInput.Text = string.Empty;
 
+            SaraUI_ToggleButton validationToggle = new SaraUI_ToggleButton {
+                AccessibleDescription = "Activa, desactiva o deja indeterminada la entrada numérica.",
+                AccessibleName = "Validación de entrada numérica",
+                AnimationDuration = 220,
+                AnimationEasing = SaraEasing.EaseInOutCubic,
+                CheckState = CheckState.Checked,
+                FocusBorderColor = Color.HotPink,
+                IndeterminateBackColor = Color.DarkGoldenrod,
+                Location = new Point(224, 475),
+                OffBackColor = Color.Gray,
+                OnBackColor = Color.MediumSlateBlue,
+                Size = new Size(50, 26),
+                TabIndex = 5,
+                Text = "Validación de entrada numérica",
+                ThreeState = true
+            };
+
+            Label toggleStateLabel = CreateLabel(
+                string.Empty,
+                new Point(282, 466),
+                new Size(126, 40));
+            toggleStateLabel.TextAlign = ContentAlignment.MiddleLeft;
+
+            CheckBox disableToggleCheckBox = new CheckBox {
+                Location = new Point(414, 473),
+                Size = new Size(130, 30),
+                TabIndex = 6,
+                Text = "Deshabilitar"
+            };
+
+            void UpdateToggleState() {
+                toggleStateLabel.Text =
+                    $"{validationToggle.CheckState}\n" +
+                    $"{validationToggle.VisualState} | {validationToggle.AnimationState}";
+            }
+
+            validationToggle.CheckStateChanged += (_, _) => {
+                numericInput.Enabled = validationToggle.CheckState != CheckState.Unchecked;
+                UpdateToggleState();
+            };
+            validationToggle.VisualStateChanged += (_, _) => UpdateToggleState();
+            validationToggle.AnimationStateChanged += (_, _) => UpdateToggleState();
+            disableToggleCheckBox.CheckedChanged += (_, _) => {
+                validationToggle.Enabled = !disableToggleCheckBox.Checked;
+                UpdateToggleState();
+            };
+
             panel2.Controls.Add(titleLabel);
             panel2.Controls.Add(instructionsLabel);
             panel2.Controls.Add(textInput);
@@ -359,6 +406,11 @@ namespace Sara_UI_Design.Demo {
             panel2.Controls.Add(multilineInput);
             panel2.Controls.Add(eventStatusLabel);
             panel2.Controls.Add(clearButton);
+            panel2.Controls.Add(validationToggle);
+            panel2.Controls.Add(toggleStateLabel);
+            panel2.Controls.Add(disableToggleCheckBox);
+
+            UpdateToggleState();
         }
 
         private void ConfigureSideBarExamples() {
