@@ -13,7 +13,7 @@ Una biblioteca de controles personalizados para **Windows Forms sobre .NET**, en
 - **SaraUI_ToggleButton**: interruptor animado con estados de interacción y soporte de tres estados.
 - **SaraUI_ComboBox**: lista desplegable personalizable.
 - **SaraUI_PictureBox**: imágenes circulares con bordes degradados.
-- **SaraUI_RadioButton**: botón de opción con efectos visuales.
+- **SaraUI_RadioButton**: botón de opción animado con estados de interacción y navegación accesible.
 - **SaraUI_Line**: separador horizontal o vertical.
 - **SaraUI_SideBar**: barra lateral expandible con animaciones temporales y estados observables.
 
@@ -100,6 +100,19 @@ notificationsToggle.Checked = true;
 ```
 
 El interruptor conserva el evento estándar `CheckedChanged` y agrega estado visual observable, eventos de animación, pausa, reanudación y detención. Cuando `ThreeState` está activo, utilice `CheckStateChanged` para distinguir también el estado indeterminado. `Text` se almacena para accesibilidad y automatización, pero no se dibuja dentro de su superficie compacta; configure además `AccessibleName` y `AccessibleDescription` según el formulario.
+
+`SaraUI_RadioButton` conserva la selección exclusiva y la navegación estándar de Windows Forms, pero anima el indicador y los colores cuando cambia `Checked`. También representa hover, presión, foco y estado deshabilitado:
+
+```csharp
+basicOption.CheckedColor = Color.MediumSlateBlue;
+basicOption.UncheckedColor = Color.Gray;
+basicOption.HoverColor = Color.SlateBlue;
+basicOption.FocusBorderColor = Color.HotPink;
+basicOption.AnimationDuration = 220;
+basicOption.Checked = true;
+```
+
+Los RadioButton que deban excluirse entre sí deben agregarse al mismo contenedor, por ejemplo un `Panel` o `GroupBox`. El control respeta `CheckAlign`, `TextAlign`, `Padding`, `RightToLeft`, mnemónicos y elipsis. `RadioSize`, `IndicatorSize` y `TextSpacing` permiten ajustar su geometría. El nombre histórico `UnCheckedColor` continúa disponible para compatibilidad; el código nuevo debe utilizar `UncheckedColor`.
 
 `SaraUI_ProgressBar` separa el valor lógico solicitado del valor interpolado que se está dibujando. Admite progreso determinado, segmento indeterminado, degradado, texto deslizante y dirección de derecha a izquierda:
 

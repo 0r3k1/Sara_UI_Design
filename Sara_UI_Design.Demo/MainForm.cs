@@ -7,6 +7,7 @@ namespace Sara_UI_Design.Demo {
             InitializeComponent();
             ConfigureAnimationExamples();
             ConfigureButtonExamples();
+            ConfigureRadioButtonExamples();
             ConfigureTextBoxExamples();
             ConfigureSideBarExamples();
         }
@@ -209,7 +210,7 @@ namespace Sara_UI_Design.Demo {
             Label titleLabel = CreateLabel(
                 "SaraUI_Button: ratón, foco, teclado y estado deshabilitado",
                 new Point(24, 606),
-                new Size(520, 26));
+                new Size(288, 26));
 
             SaraUI_Button saveButton = new SaraUI_Button {
                 AccessibleDescription = "Guarda los datos de la demostración.",
@@ -255,15 +256,15 @@ namespace Sara_UI_Design.Demo {
 
             CheckBox disableCheckBox = new CheckBox {
                 AutoSize = true,
-                Location = new Point(326, 638),
+                Location = new Point(24, 680),
                 TabIndex = 2,
                 Text = "Deshabilitar Guardar"
             };
 
             Label stateLabel = CreateLabel(
                 string.Empty,
-                new Point(326, 658),
-                new Size(218, 24));
+                new Point(174, 680),
+                new Size(138, 24));
 
             SaraUI_Button activeButton = saveButton;
 
@@ -296,6 +297,106 @@ namespace Sara_UI_Design.Demo {
             panel1.Controls.Add(deleteButton);
             panel1.Controls.Add(disableCheckBox);
             panel1.Controls.Add(stateLabel);
+
+            UpdateStateLabel();
+        }
+
+        private void ConfigureRadioButtonExamples() {
+            GroupBox optionsGroup = new GroupBox {
+                Location = new Point(326, 594),
+                Size = new Size(218, 110),
+                TabIndex = 3,
+                TabStop = false,
+                Text = "SaraUI_RadioButton"
+            };
+
+            SaraUI_RadioButton basicOption = new SaraUI_RadioButton {
+                AccessibleDescription = "Selecciona el plan básico de la demostración.",
+                AccessibleName = "Plan básico",
+                AnimationDuration = 220,
+                AnimationEasing = SaraEasing.EaseInOutCubic,
+                AutoSize = false,
+                Checked = true,
+                CheckedColor = Color.MediumSlateBlue,
+                FocusBorderColor = Color.HotPink,
+                HoverColor = Color.SlateBlue,
+                Location = new Point(10, 24),
+                PressedColor = Color.DarkSlateBlue,
+                Size = new Size(94, 26),
+                TabIndex = 0,
+                Text = "&Básico",
+                UncheckedColor = Color.Gray
+            };
+
+            SaraUI_RadioButton proOption = new SaraUI_RadioButton {
+                AccessibleDescription = "Selecciona el plan profesional de la demostración.",
+                AccessibleName = "Plan profesional",
+                AnimationDuration = 220,
+                AnimationEasing = SaraEasing.EaseInOutCubic,
+                AutoSize = false,
+                CheckedColor = Color.MediumSlateBlue,
+                FocusBorderColor = Color.HotPink,
+                HoverColor = Color.SlateBlue,
+                Location = new Point(10, 54),
+                PressedColor = Color.DarkSlateBlue,
+                Size = new Size(94, 26),
+                TabIndex = 1,
+                Text = "&Pro",
+                UncheckedColor = Color.Gray
+            };
+
+            Label stateLabel = CreateLabel(
+                string.Empty,
+                new Point(110, 22),
+                new Size(98, 42));
+
+            CheckBox disableCheckBox = new CheckBox {
+                Location = new Point(110, 70),
+                Size = new Size(100, 24),
+                TabIndex = 2,
+                Text = "Deshabilitar"
+            };
+
+            SaraUI_RadioButton activeOption = basicOption;
+
+            void UpdateStateLabel() {
+                stateLabel.Text =
+                    $"{activeOption.Text.Replace("&", string.Empty)}: {activeOption.VisualState}\n" +
+                    $"{activeOption.AnimationState} ({activeOption.DisplayedCheckedProgress:0.00})";
+            }
+
+            void ObserveOption(SaraUI_RadioButton option) {
+                option.CheckedChanged += (_, _) => {
+                    if(option.Checked) {
+                        activeOption = option;
+                    }
+
+                    UpdateStateLabel();
+                };
+                option.VisualStateChanged += (_, _) => {
+                    activeOption = option;
+                    UpdateStateLabel();
+                };
+                option.AnimationStateChanged += (_, _) => {
+                    activeOption = option;
+                    UpdateStateLabel();
+                };
+            }
+
+            ObserveOption(basicOption);
+            ObserveOption(proOption);
+            disableCheckBox.CheckedChanged += (_, _) => {
+                basicOption.Enabled = !disableCheckBox.Checked;
+                proOption.Enabled = !disableCheckBox.Checked;
+                activeOption = basicOption.Checked ? basicOption : proOption;
+                UpdateStateLabel();
+            };
+
+            optionsGroup.Controls.Add(basicOption);
+            optionsGroup.Controls.Add(proOption);
+            optionsGroup.Controls.Add(stateLabel);
+            optionsGroup.Controls.Add(disableCheckBox);
+            panel1.Controls.Add(optionsGroup);
 
             UpdateStateLabel();
         }
