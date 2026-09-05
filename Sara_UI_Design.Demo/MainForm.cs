@@ -9,6 +9,7 @@ namespace Sara_UI_Design.Demo {
             ConfigureButtonExamples();
             ConfigureRadioButtonExamples();
             ConfigureTextBoxExamples();
+            ConfigureComboBoxExamples();
             ConfigureSideBarExamples();
         }
 
@@ -406,29 +407,29 @@ namespace Sara_UI_Design.Demo {
             panel2.Padding = new Padding(24);
 
             Label titleLabel = CreateLabel(
-                "Pruebas de SaraUI_TextBox y SaraUI_ToggleButton",
+                "Pruebas de SaraUI_TextBox, SaraUI_ComboBox y SaraUI_ToggleButton",
                 new Point(24, 24),
                 new Size(520, 28));
 
             Label instructionsLabel = CreateLabel(
-                "Los contadores deben avanzar juntos. El interruptor controla la entrada numérica y admite tres estados.",
+                "Comprueba entradas, selección desplegable y los tres estados del interruptor.",
                 new Point(24, 56),
                 new Size(520, 42));
 
             SaraUI_TextBox textInput = CreateTextBox("Buscar por nombre", "Search", new Point(24, 112));
-            SaraUI_TextBox passwordInput = CreateTextBox("Contraseña", "Lock", new Point(24, 176));
+            SaraUI_TextBox passwordInput = CreateTextBox("Contraseña", "Lock", new Point(24, 164));
             passwordInput.Type = SaraUI_TextBox.InputType.Password;
 
-            SaraUI_TextBox numericInput = CreateTextBox("Solo números", "Stats", new Point(24, 240));
+            SaraUI_TextBox numericInput = CreateTextBox("Solo números", "Stats", new Point(24, 216));
             numericInput.Type = SaraUI_TextBox.InputType.Numeric;
 
-            SaraUI_TextBox multilineInput = CreateTextBox("Escribe una descripción", "Edit", new Point(24, 304));
+            SaraUI_TextBox multilineInput = CreateTextBox("Escribe una descripción", "Edit", new Point(24, 316));
             multilineInput.Type = SaraUI_TextBox.InputType.Multiline;
-            multilineInput.Height = 96;
+            multilineInput.Height = 76;
 
             Label eventStatusLabel = CreateLabel(
                 "TextChanged: 0 | _TextChanged: 0",
-                new Point(24, 424),
+                new Point(24, 400),
                 new Size(520, 28));
 
             int standardEventCount = 0;
@@ -445,7 +446,7 @@ namespace Sara_UI_Design.Demo {
             };
 
             Button clearButton = new Button {
-                Location = new Point(24, 468),
+                Location = new Point(24, 436),
                 Size = new Size(180, 36),
                 Text = "Vaciar texto normal",
                 UseVisualStyleBackColor = true
@@ -460,7 +461,7 @@ namespace Sara_UI_Design.Demo {
                 CheckState = CheckState.Checked,
                 FocusBorderColor = Color.HotPink,
                 IndeterminateBackColor = Color.DarkGoldenrod,
-                Location = new Point(224, 475),
+                Location = new Point(224, 443),
                 OffBackColor = Color.Gray,
                 OnBackColor = Color.MediumSlateBlue,
                 Size = new Size(50, 26),
@@ -471,12 +472,12 @@ namespace Sara_UI_Design.Demo {
 
             Label toggleStateLabel = CreateLabel(
                 string.Empty,
-                new Point(282, 466),
+                new Point(282, 434),
                 new Size(126, 40));
             toggleStateLabel.TextAlign = ContentAlignment.MiddleLeft;
 
             CheckBox disableToggleCheckBox = new CheckBox {
-                Location = new Point(414, 473),
+                Location = new Point(414, 441),
                 Size = new Size(130, 30),
                 TabIndex = 6,
                 Text = "Deshabilitar"
@@ -514,15 +515,84 @@ namespace Sara_UI_Design.Demo {
             UpdateToggleState();
         }
 
+        private void ConfigureComboBoxExamples() {
+            SaraUI_ComboBox environmentComboBox = new SaraUI_ComboBox {
+                AccessibleDescription = "Selecciona el entorno utilizado por la demostración.",
+                AccessibleName = "Entorno de ejecución",
+                AnimationDuration = 220,
+                AnimationEasing = SaraEasing.EaseInOutCubic,
+                BackColor = Color.White,
+                BorderColor = Color.MediumSlateBlue,
+                BorderFocusColor = Color.HotPink,
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                HoverBackColor = Color.Lavender,
+                IconColor = Color.MediumSlateBlue,
+                ListBackColor = Color.White,
+                ListTextColor = Color.DimGray,
+                Location = new Point(24, 268),
+                PlaceholderText = "Selecciona un entorno",
+                Size = new Size(330, 40),
+                TabIndex = 3
+            };
+            environmentComboBox.Items.AddRange(new object[] {
+                "Desarrollo",
+                "Pruebas",
+                "Producción"
+            });
+
+            Label stateLabel = CreateLabel(
+                string.Empty,
+                new Point(366, 266),
+                new Size(178, 24));
+            stateLabel.TextAlign = ContentAlignment.MiddleLeft;
+
+            CheckBox disableCheckBox = new CheckBox {
+                Location = new Point(366, 288),
+                Size = new Size(178, 24),
+                TabIndex = 4,
+                Text = "Deshabilitar lista"
+            };
+
+            int standardEventCount = 0;
+            int legacyEventCount = 0;
+
+            void UpdateStateLabel() {
+                stateLabel.Text =
+                    $"{environmentComboBox.VisualState} | {environmentComboBox.AnimationState} " +
+                    $"S:{standardEventCount} A:{legacyEventCount}";
+            }
+
+            environmentComboBox.SelectedIndexChanged += (_, _) => {
+                standardEventCount++;
+                UpdateStateLabel();
+            };
+            environmentComboBox.OnSelectedIndexChanged += (_, _) => {
+                legacyEventCount++;
+                UpdateStateLabel();
+            };
+            environmentComboBox.VisualStateChanged += (_, _) => UpdateStateLabel();
+            environmentComboBox.AnimationStateChanged += (_, _) => UpdateStateLabel();
+            disableCheckBox.CheckedChanged += (_, _) => {
+                environmentComboBox.Enabled = !disableCheckBox.Checked;
+                UpdateStateLabel();
+            };
+
+            panel2.Controls.Add(environmentComboBox);
+            panel2.Controls.Add(stateLabel);
+            panel2.Controls.Add(disableCheckBox);
+
+            UpdateStateLabel();
+        }
+
         private void ConfigureSideBarExamples() {
             Label titleLabel = CreateLabel(
                 "Pruebas de SaraUI_SideBar",
-                new Point(24, 520),
+                new Point(24, 488),
                 new Size(520, 28));
 
             Panel sideBarHost = new Panel {
                 BackColor = Color.FromArgb(238, 238, 248),
-                Location = new Point(24, 552),
+                Location = new Point(24, 520),
                 Size = new Size(520, 128)
             };
 

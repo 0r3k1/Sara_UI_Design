@@ -11,7 +11,7 @@ Una biblioteca de controles personalizados para **Windows Forms sobre .NET**, en
 - **SaraUI_CircularProgressBar**: progreso circular animado.
 - **SaraUI_ProgressBar**: progreso lineal determinado o Marquee con texto y degradado.
 - **SaraUI_ToggleButton**: interruptor animado con estados de interacción y soporte de tres estados.
-- **SaraUI_ComboBox**: lista desplegable personalizable.
+- **SaraUI_ComboBox**: lista desplegable compuesta con datos, estados accesibles y transiciones visuales.
 - **SaraUI_PictureBox**: imágenes circulares con bordes degradados.
 - **SaraUI_RadioButton**: botón de opción animado con estados de interacción y navegación accesible.
 - **SaraUI_Line**: separador horizontal o vertical.
@@ -113,6 +113,22 @@ basicOption.Checked = true;
 ```
 
 Los RadioButton que deban excluirse entre sí deben agregarse al mismo contenedor, por ejemplo un `Panel` o `GroupBox`. El control respeta `CheckAlign`, `TextAlign`, `Padding`, `RightToLeft`, mnemónicos y elipsis. `RadioSize`, `IndicatorSize` y `TextSpacing` permiten ajustar su geometría. El nombre histórico `UnCheckedColor` continúa disponible para compatibilidad; el código nuevo debe utilizar `UncheckedColor`.
+
+`SaraUI_ComboBox` conserva una instancia nativa de `ComboBox` para selección, enlace de datos, autocompletado y navegación mediante teclado. Su superficie representa los estados normal, hover, presionado, enfocado, desplegado y deshabilitado; al abrir la lista, la flecha y los colores cambian mediante `SaraAnimator`:
+
+```csharp
+environmentComboBox.DropDownStyle = ComboBoxStyle.DropDownList;
+environmentComboBox.PlaceholderText = "Selecciona un entorno";
+environmentComboBox.Items.AddRange(new object[] {
+    "Desarrollo",
+    "Pruebas",
+    "Producción"
+});
+environmentComboBox.AnimationDuration = 220;
+environmentComboBox.AnimationEasing = SaraEasing.EaseInOutCubic;
+```
+
+El evento `SelectedIndexChanged` sigue la convención de Windows Forms; `OnSelectedIndexChanged` continúa disponible para código existente. `DataSource`, `SelectedItem` y `SelectedValue` aceptan y devuelven `null` cuando la lista no está enlazada o no tiene selección. El estilo `Simple` no es compatible con la superficie compuesta; utilice `DropDown` o `DropDownList`. La lista puede abrirse y cerrarse mediante `OpenDropDown`, `CloseDropDown` o `DroppedDown`.
 
 `SaraUI_ProgressBar` separa el valor lógico solicitado del valor interpolado que se está dibujando. Admite progreso determinado, segmento indeterminado, degradado, texto deslizante y dirección de derecha a izquierda:
 
