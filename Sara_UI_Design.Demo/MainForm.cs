@@ -23,7 +23,7 @@ namespace Sara_UI_Design.Demo {
                 new Size(520, 28));
 
             Label instructionsLabel = CreateLabel(
-                "Compara el progreso circular y lineal, el movimiento de un control y la opacidad de la ventana.",
+                "Compara ambos progresos, el movimiento, la opacidad y barras de desplazamiento en los dos ejes.",
                 new Point(24, 56),
                 new Size(520, 44));
 
@@ -72,10 +72,58 @@ namespace Sara_UI_Design.Demo {
 
             Panel movingPanel = new Panel {
                 BackColor = Color.MediumSlateBlue,
-                Location = new Point(16, 16),
+                Location = new Point(16, 8),
                 Size = new Size(36, 36)
             };
+
+            SaraUI_ScrollBar horizontalScroll = new SaraUI_ScrollBar {
+                AccessibleDescription = "Desplaza horizontalmente un valor entre cero y cien.",
+                AccessibleName = "Desplazamiento horizontal de demostración",
+                AnimationDuration = 300,
+                AnimationEasing = SaraEasing.EaseInOutCubic,
+                AutoSizeForOrientation = false,
+                ChannelColor = Color.FromArgb(218, 218, 234),
+                ChannelThickness = 8,
+                FocusBorderColor = Color.HotPink,
+                HoverThumbColor = Color.SlateBlue,
+                LargeChange = 20,
+                Location = new Point(16, 52),
+                MinimumThumbSize = 32,
+                Orientation = SaraUI_ScrollBar.ScrollOrientation.Horizontal,
+                PressedThumbColor = Color.DarkSlateBlue,
+                Size = new Size(458, 12),
+                SmallChange = 5,
+                TabIndex = 0,
+                ThumbColor = Color.MediumSlateBlue,
+                Value = 20
+            };
+
+            SaraUI_ScrollBar verticalScroll = new SaraUI_ScrollBar {
+                AccessibleDescription = "Desplaza verticalmente un valor entre cero y cien.",
+                AccessibleName = "Desplazamiento vertical de demostración",
+                AnimationDuration = 300,
+                AnimationEasing = SaraEasing.EaseInOutCubic,
+                AutoSizeForOrientation = false,
+                ChannelColor = Color.FromArgb(218, 218, 234),
+                ChannelThickness = 8,
+                FocusBorderColor = Color.HotPink,
+                HoverThumbColor = Color.SlateBlue,
+                LargeChange = 20,
+                Location = new Point(494, 8),
+                MinimumThumbSize = 12,
+                PressedThumbColor = Color.DarkSlateBlue,
+                Size = new Size(12, 40),
+                SmallChange = 5,
+                TabIndex = 1,
+                ThumbColor = Color.MediumSlateBlue,
+                Value = 20
+            };
+
+            SaraUI_ScrollBar activeScroll = horizontalScroll;
+
             motionTrack.Controls.Add(movingPanel);
+            motionTrack.Controls.Add(horizontalScroll);
+            motionTrack.Controls.Add(verticalScroll);
             controlTransitions.Target = movingPanel;
             windowTransitions.Target = this;
 
@@ -98,7 +146,9 @@ namespace Sara_UI_Design.Demo {
                 stateLabel.Text =
                     $"Circular: {circularProgress.AnimationState} | Lineal: {linearProgress.AnimationState} " +
                     $"({linearProgress.DisplayedValue:0})\n" +
-                    $"Panel: {controlTransitions.State} | Ventana: {windowTransitions.State}";
+                    $"P: {controlTransitions.State} | V: {windowTransitions.State} | " +
+                    $"H:{horizontalScroll.Value} V:{verticalScroll.Value} | " +
+                    $"S:{activeScroll.VisualState}/{activeScroll.AnimationState}";
             }
 
             void SetProgressValue(int value) {
@@ -113,6 +163,8 @@ namespace Sara_UI_Design.Demo {
                 circularProgress.Text = value.ToString();
                 circularProgress.Value = value;
                 linearProgress.Value = value;
+                horizontalScroll.Value = value;
+                verticalScroll.Value = 100 - value;
             }
 
             value25Button.Click += (_, _) => SetProgressValue(25);
@@ -130,7 +182,7 @@ namespace Sara_UI_Design.Demo {
 
             moveButton.Click += (_, _) => {
                 int leftDestination = 16;
-                int rightDestination = motionTrack.ClientSize.Width - movingPanel.Width - 16;
+                int rightDestination = verticalScroll.Left - movingPanel.Width - 16;
                 int destination = movingPanel.Left < motionTrack.ClientSize.Width / 2
                     ? rightDestination
                     : leftDestination;
@@ -160,6 +212,8 @@ namespace Sara_UI_Design.Demo {
                 windowTransitions.Pause();
                 circularProgress.PauseAnimation();
                 linearProgress.PauseAnimation();
+                horizontalScroll.PauseAnimation();
+                verticalScroll.PauseAnimation();
             };
 
             resumeButton.Click += (_, _) => {
@@ -167,6 +221,8 @@ namespace Sara_UI_Design.Demo {
                 windowTransitions.Resume();
                 circularProgress.ResumeAnimation();
                 linearProgress.ResumeAnimation();
+                horizontalScroll.ResumeAnimation();
+                verticalScroll.ResumeAnimation();
             };
 
             stopButton.Click += (_, _) => {
@@ -174,12 +230,32 @@ namespace Sara_UI_Design.Demo {
                 windowTransitions.Stop();
                 circularProgress.StopAnimation();
                 linearProgress.StopAnimation();
+                horizontalScroll.StopAnimation();
+                verticalScroll.StopAnimation();
             };
 
             controlTransitions.StateChanged += (_, _) => UpdateStateLabel();
             windowTransitions.StateChanged += (_, _) => UpdateStateLabel();
             circularProgress.AnimationStateChanged += (_, _) => UpdateStateLabel();
             linearProgress.AnimationStateChanged += (_, _) => UpdateStateLabel();
+
+            void ObserveScroll(SaraUI_ScrollBar scrollBar) {
+                scrollBar.ValueChanged += (_, _) => {
+                    activeScroll = scrollBar;
+                    UpdateStateLabel();
+                };
+                scrollBar.VisualStateChanged += (_, _) => {
+                    activeScroll = scrollBar;
+                    UpdateStateLabel();
+                };
+                scrollBar.AnimationStateChanged += (_, _) => {
+                    activeScroll = scrollBar;
+                    UpdateStateLabel();
+                };
+            }
+
+            ObserveScroll(horizontalScroll);
+            ObserveScroll(verticalScroll);
 
             actionsPanel.Controls.Add(value25Button);
             actionsPanel.Controls.Add(value80Button);
@@ -191,7 +267,7 @@ namespace Sara_UI_Design.Demo {
             actionsPanel.Controls.Add(fadeButton);
 
             Label checklistLabel = CreateLabel(
-                "Verifica: ambos progresos deben coincidir; movimiento y opacidad suaves; pausa sin saltos; reanudación desde el mismo punto y detención inmediata.",
+                "Verifica: progresos y scroll animados; arrastre directo; canal, rueda y teclado funcionales; pausa sin saltos y detención inmediata.",
                 new Point(24, 516),
                 new Size(520, 78));
 

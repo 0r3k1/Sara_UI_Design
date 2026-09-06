@@ -12,6 +12,7 @@ Una biblioteca de controles personalizados para **Windows Forms sobre .NET**, en
 - **SaraUI_ProgressBar**: progreso lineal determinado o Marquee con texto y degradado.
 - **SaraUI_ToggleButton**: interruptor animado con estados de interacción y soporte de tres estados.
 - **SaraUI_ComboBox**: lista desplegable compuesta con datos, estados accesibles y transiciones visuales.
+- **SaraUI_ScrollBar**: desplazamiento horizontal o vertical con arrastre, teclado y estados animados.
 - **SaraUI_PictureBox**: imágenes circulares con bordes degradados.
 - **SaraUI_RadioButton**: botón de opción animado con estados de interacción y navegación accesible.
 - **SaraUI_Line**: separador horizontal o vertical.
@@ -129,6 +130,20 @@ environmentComboBox.AnimationEasing = SaraEasing.EaseInOutCubic;
 ```
 
 El evento `SelectedIndexChanged` sigue la convención de Windows Forms; `OnSelectedIndexChanged` continúa disponible para código existente. `DataSource`, `SelectedItem` y `SelectedValue` aceptan y devuelven `null` cuando la lista no está enlazada o no tiene selección. El estilo `Simple` no es compatible con la superficie compuesta; utilice `DropDown` o `DropDownList`. La lista puede abrirse y cerrarse mediante `OpenDropDown`, `CloseDropDown` o `DroppedDown`.
+
+`SaraUI_ScrollBar` mantiene un valor lógico entero y una posición visual interpolada. Admite orientación horizontal o vertical, clic por páginas en el canal, arrastre con captura del ratón, rueda, flechas, `PageUp`, `PageDown`, `Home` y `End`:
+
+```csharp
+contentScroll.SetRange(0, 100);
+contentScroll.Orientation = SaraUI_ScrollBar.ScrollOrientation.Vertical;
+contentScroll.SmallChange = 5;
+contentScroll.LargeChange = 20;
+contentScroll.AnimationDuration = 300;
+contentScroll.AnimationEasing = SaraEasing.EaseInOutCubic;
+contentScroll.Value = 40;
+```
+
+`DisplayedValue` permite observar la posición animada sin alterar el destino expuesto por `Value`. Durante el arrastre, el indicador sigue directamente al puntero y genera eventos `Scroll` de tipo `ThumbTrack`; `ValueChanged` se genera una sola vez por cada valor lógico diferente. `RightToLeft` invierte automáticamente una barra horizontal, mientras `ReverseDirection` permite invertir cualquiera de los dos ejes. Las transiciones pueden pausarse, reanudarse o detenerse mediante `PauseAnimation`, `ResumeAnimation` y `StopAnimation`.
 
 `SaraUI_ProgressBar` separa el valor lógico solicitado del valor interpolado que se está dibujando. Admite progreso determinado, segmento indeterminado, degradado, texto deslizante y dirección de derecha a izquierda:
 
