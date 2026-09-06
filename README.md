@@ -12,6 +12,7 @@ Una biblioteca de controles personalizados para **Windows Forms sobre .NET**, en
 - **SaraUI_ProgressBar**: progreso lineal determinado o Marquee con texto y degradado.
 - **SaraUI_ToggleButton**: interruptor animado con estados de interacción y soporte de tres estados.
 - **SaraUI_ComboBox**: lista desplegable compuesta con datos, estados accesibles y transiciones visuales.
+- **SaraUI_DatePicker**: selector de fecha nativo con superficie redondeada y estados animados.
 - **SaraUI_ScrollBar**: desplazamiento horizontal o vertical con arrastre, teclado y estados animados.
 - **SaraUI_PictureBox**: imágenes circulares con bordes degradados.
 - **SaraUI_RadioButton**: botón de opción animado con estados de interacción y navegación accesible.
@@ -130,6 +131,22 @@ environmentComboBox.AnimationEasing = SaraEasing.EaseInOutCubic;
 ```
 
 El evento `SelectedIndexChanged` sigue la convención de Windows Forms; `OnSelectedIndexChanged` continúa disponible para código existente. `DataSource`, `SelectedItem` y `SelectedValue` aceptan y devuelven `null` cuando la lista no está enlazada o no tiene selección. El estilo `Simple` no es compatible con la superficie compuesta; utilice `DropDown` o `DropDownList`. La lista puede abrirse y cerrarse mediante `OpenDropDown`, `CloseDropDown` o `DroppedDown`.
+
+`SaraUI_DatePicker` conserva el calendario nativo de Windows Forms, sus rangos, formatos, selección y navegación mediante teclado. La superficie personalizada representa los estados normal, hover, presionado, enfocado, desplegado y deshabilitado sin bloquear `F4`, `Alt+↓` ni las teclas utilizadas para cambiar la fecha:
+
+```csharp
+appointmentDate.Format = DateTimePickerFormat.Custom;
+appointmentDate.CustomFormat = "dd/MM/yyyy";
+appointmentDate.MinDate = DateTime.Today;
+appointmentDate.MaxDate = DateTime.Today.AddYears(1);
+appointmentDate.SkinColor = Color.White;
+appointmentDate.TextColor = Color.DimGray;
+appointmentDate.BorderColor = Color.MediumSlateBlue;
+appointmentDate.FocusBorderColor = Color.HotPink;
+appointmentDate.AnimationDuration = 220;
+```
+
+El calendario puede controlarse mediante `OpenDropDown` y `CloseDropDown`; el primer método devuelve `false` si el selector está deshabilitado o usa `ShowUpDown`. `IsDropDownOpen`, `VisualState`, `AnimationState` y `DisplayedDropDownProgress` permiten observar el comportamiento sin sustituir la lógica nativa. Las transiciones pueden pausarse, reanudarse o detenerse mediante `PauseAnimation`, `ResumeAnimation` y `StopAnimation`.
 
 `SaraUI_ScrollBar` mantiene un valor lógico entero y una posición visual interpolada. Admite orientación horizontal o vertical, clic por páginas en el canal, arrastre con captura del ratón, rueda, flechas, `PageUp`, `PageDown`, `Home` y `End`:
 

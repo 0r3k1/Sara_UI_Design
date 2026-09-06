@@ -6,6 +6,7 @@ namespace Sara_UI_Design.Demo {
         public MainForm() {
             InitializeComponent();
             ConfigureAnimationExamples();
+            ConfigureDatePickerExamples();
             ConfigureButtonExamples();
             ConfigureRadioButtonExamples();
             ConfigureTextBoxExamples();
@@ -269,7 +270,7 @@ namespace Sara_UI_Design.Demo {
             Label checklistLabel = CreateLabel(
                 "Verifica: progresos y scroll animados; arrastre directo; canal, rueda y teclado funcionales; pausa sin saltos y detención inmediata.",
                 new Point(24, 516),
-                new Size(520, 78));
+                new Size(288, 78));
 
             panel1.Controls.Add(titleLabel);
             panel1.Controls.Add(instructionsLabel);
@@ -279,6 +280,73 @@ namespace Sara_UI_Design.Demo {
             panel1.Controls.Add(motionTrack);
             panel1.Controls.Add(actionsPanel);
             panel1.Controls.Add(checklistLabel);
+
+            UpdateStateLabel();
+        }
+
+        private void ConfigureDatePickerExamples() {
+            Label titleLabel = CreateLabel(
+                "SaraUI_DatePicker",
+                new Point(326, 516),
+                new Size(218, 20));
+
+            SaraUI_DatePicker appointmentDate = new SaraUI_DatePicker {
+                AccessibleDescription = "Selecciona la fecha de una cita desde el calendario.",
+                AccessibleName = "Fecha de la cita",
+                AnimationDuration = 220,
+                AnimationEasing = SaraEasing.EaseInOutCubic,
+                BorderColor = Color.MediumSlateBlue,
+                BorderRadius = 10,
+                BorderSize = 1,
+                CustomFormat = "dd/MM/yyyy",
+                DroppedDownSkinColor = Color.Lavender,
+                FocusBorderColor = Color.HotPink,
+                Format = DateTimePickerFormat.Custom,
+                HoverSkinColor = Color.FromArgb(245, 242, 255),
+                IconColor = Color.MediumSlateBlue,
+                Location = new Point(326, 538),
+                MaxDate = DateTime.Today.AddYears(1),
+                MinDate = DateTime.Today.AddYears(-1),
+                PressedSkinColor = Color.FromArgb(230, 224, 250),
+                Size = new Size(218, 36),
+                SkinColor = Color.White,
+                TabIndex = 4,
+                TextColor = Color.DimGray,
+                Value = DateTime.Today
+            };
+
+            Label stateLabel = CreateLabel(
+                string.Empty,
+                new Point(326, 574),
+                new Size(122, 20));
+
+            CheckBox disableCheckBox = new CheckBox {
+                Location = new Point(450, 574),
+                Size = new Size(94, 20),
+                TabIndex = 5,
+                Text = "Deshabilitar"
+            };
+
+            void UpdateStateLabel() {
+                stateLabel.Text =
+                    $"{appointmentDate.VisualState} | {appointmentDate.AnimationState} " +
+                    $"{appointmentDate.DisplayedDropDownProgress:0.0}";
+            }
+
+            appointmentDate.ValueChanged += (_, _) => UpdateStateLabel();
+            appointmentDate.DropDown += (_, _) => UpdateStateLabel();
+            appointmentDate.CloseUp += (_, _) => UpdateStateLabel();
+            appointmentDate.VisualStateChanged += (_, _) => UpdateStateLabel();
+            appointmentDate.AnimationStateChanged += (_, _) => UpdateStateLabel();
+            disableCheckBox.CheckedChanged += (_, _) => {
+                appointmentDate.Enabled = !disableCheckBox.Checked;
+                UpdateStateLabel();
+            };
+
+            panel1.Controls.Add(titleLabel);
+            panel1.Controls.Add(appointmentDate);
+            panel1.Controls.Add(stateLabel);
+            panel1.Controls.Add(disableCheckBox);
 
             UpdateStateLabel();
         }
