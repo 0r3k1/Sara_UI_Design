@@ -1,4 +1,4 @@
 <Solution>
   <Project Path="Sara_UI_Design/Sara_UI_Design.csproj" Id="f0663349-2352-4fc1-8a1d-a3d8de3b79c8" />
-  <Project Path="Test_Sara_UI/Test_Sara_UI.csproj" Id="afae6d78-e759-4461-9239-349409aac55b" />
+  <Project Path="Sara_UI_Design.Demo/Sara_UI_Design.Demo.csproj" Id="afae6d78-e759-4461-9239-349409aac55b" />
 </Solution>

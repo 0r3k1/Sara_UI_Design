@@ -1831,6 +1831,41 @@ namespace Sara_UI_Design.SaraControls {
             }
         }
 
+        public static void DrawChevronDown(Graphics g, Rectangle rect, Color color) {
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            using(GraphicsPath path = new GraphicsPath())
+            using(Pen pen = new Pen(color, 2.2f)) {
+                pen.StartCap = LineCap.Round;
+                pen.EndCap = LineCap.Round;
+                pen.LineJoin = LineJoin.Round;
+
+                float leftX = rect.X;
+                float centerX = rect.X + rect.Width / 2f;
+                float rightX = rect.Right;
+
+                float topY = rect.Y + rect.Height * 0.25f;
+                float bottomY = rect.Bottom - rect.Height * 0.25f;
+
+                // Curva izquierda → centro → derecha
+                path.AddBezier(
+                    leftX, topY,
+                    leftX + rect.Width * 0.15f, topY,
+                    centerX - rect.Width * 0.15f, bottomY,
+                    centerX, bottomY
+                );
+
+                path.AddBezier(
+                    centerX, bottomY,
+                    centerX + rect.Width * 0.15f, bottomY,
+                    rightX - rect.Width * 0.15f, topY,
+                    rightX, topY
+                );
+
+                g.DrawPath(pen, path);
+            }
+        }
+
         public static void DrawSync(Graphics g, Rectangle rect, Color color) {
             DrawRefresh(g, rect, color);
         }
@@ -1838,6 +1873,8 @@ namespace Sara_UI_Design.SaraControls {
         public static void DrawPin(Graphics g, Rectangle rect, Color color) {
             DrawMapPin(g, rect, color);
         }
+
+
 
     }
 }

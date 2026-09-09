@@ -5,40 +5,57 @@ using System.Windows.Forms;
 using System.ComponentModel;
 
 namespace Sara_UI_Design.SaraControls {
+
+    /// <summary>
+    /// Panel avanzado que combina la disposición flexible (Flexbox) con efectos de sombra realistas de degradado difuso.
+    /// </summary>
+    [ToolboxItem(true)]
     public class SaraUI_ShadowPanel:SaraUI_FlexPanel {
-        // Fields para la sombra
         private int shadowSize = 10;
         private Color shadowColor = Color.FromArgb(64, 64, 64);
         private int shadowOpacity = 100;
         private int shadowOffsetX = 0;
-        private int shadowOffsetY = 5; // Por defecto un poco hacia abajo
+        private int shadowOffsetY = 5;
 
-        // --- Propiedades en Sara UI Design ---
-
+        /// <summary>
+        /// Obtiene o establece el tamaño o difusión (blur) de la sombra en píxeles.
+        /// </summary>
         [Category("Sara UI Design")]
         public int ShadowSize {
             get => shadowSize;
             set { shadowSize = value > 0 ? value : 1; UpdatePadding(); this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el color base de la sombra. Por defecto es un gris oscuro.
+        /// </summary>
         [Category("Sara UI Design")]
         public Color ShadowColor {
             get => shadowColor;
             set { shadowColor = value; this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el nivel de transparencia de la sombra (de 0 a 255).
+        /// </summary>
         [Category("Sara UI Design")]
         public int ShadowOpacity {
             get => shadowOpacity;
             set { shadowOpacity = Math.Max(0, Math.Min(255, value)); this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el desplazamiento horizontal de la sombra respecto al centro del panel.
+        /// </summary>
         [Category("Sara UI Design")]
         public int ShadowOffsetX {
             get => shadowOffsetX;
             set { shadowOffsetX = value; this.Invalidate(); }
         }
 
+        /// <summary>
+        /// Obtiene o establece el desplazamiento vertical de la sombra.
+        /// </summary>
         [Category("Sara UI Design")]
         public int ShadowOffsetY {
             get => shadowOffsetY;
@@ -52,7 +69,6 @@ namespace Sara_UI_Design.SaraControls {
         }
 
         private void UpdatePadding() {
-            // El padding asegura que el contenido Flex no se dibuje sobre la zona de la sombra
             this.Padding = new Padding(shadowSize + Math.Abs(shadowOffsetX),
                                       shadowSize + Math.Abs(shadowOffsetY),
                                       shadowSize + Math.Abs(shadowOffsetX),
@@ -63,10 +79,8 @@ namespace Sara_UI_Design.SaraControls {
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
-            // Limpiar fondo con el color del contenedor padre
             g.Clear(this.Parent?.BackColor ?? SystemColors.Control);
 
-            // 1. Definir el área del panel blanco (fijo en el centro relativo al padding)
             Rectangle rectPanel = new Rectangle(
                 shadowSize + (shadowOffsetX < 0 ? Math.Abs(shadowOffsetX) : 0),
                 shadowSize + (shadowOffsetY < 0 ? Math.Abs(shadowOffsetY) : 0),
@@ -75,10 +89,10 @@ namespace Sara_UI_Design.SaraControls {
             );
 
             if(rectPanel.Width > 5 && rectPanel.Height > 5) {
-                // 2. Dibujar la sombra desplazada
+                // 1. Dibujar la sombra degradada atenuada
                 DrawShadow(g, rectPanel);
 
-                // 3. Dibujar el fondo del panel
+                // 2. Dibujar el fondo del contenedor principal redondeado
                 using(GraphicsPath pathPanel = GetFigurePath(rectPanel, BorderRadius))
                 using(SolidBrush brushBack = new SolidBrush(this.BackColor)) {
                     g.FillPath(brushBack, pathPanel);
@@ -87,40 +101,19 @@ namespace Sara_UI_Design.SaraControls {
         }
 
         private void DrawShadow(Graphics g, Rectangle rect) {
-            // El rectángulo de la sombra es el área del panel + el tamaño de difuminado
             Rectangle shadowRect = rect;
             shadowRect.Inflate(shadowSize, shadowSize);
-
-            // APLICAMOS EL OFFSET: Movemos el rectángulo de la sombra
             shadowRect.Offset(shadowOffsetX, shadowOffsetY);
 
             using(GraphicsPath pathShadow = GetFigurePath(shadowRect, BorderRadius))
             using(PathGradientBrush pgb = new PathGradientBrush(pathShadow)) {
-                // Mantener la intensidad en el centro
-                pgb.FocusScales = new PointF(0.85f, 0.85f);
+                // OPTIMIZACIÓN DE BLUR DE GRADIENTE CONTINUO (Acabado neumórfico suave)
+                pgb.FocusScales = new PointF(0.75f, 0.75f);
                 pgb.CenterColor = Color.FromArgb(shadowOpacity, shadowColor);
                 pgb.SurroundColors = new Color[] { Color.Transparent };
 
                 g.FillPath(pgb, pathShadow);
             }
-        }
-
-        private GraphicsPath GetFigurePath(Rectangle rect, int radius) {
-            GraphicsPath path = new GraphicsPath();
-            float s = radius * 2F;
-            if(s <= 0)
-                s = 1;
-            if(s > rect.Width)
-                s = rect.Width;
-            if(s > rect.Height)
-                s = rect.Height;
-
-            path.AddArc(rect.X, rect.Y, s, s, 180, 90);
-            path.AddArc(rect.Right - s, rect.Y, s, s, 270, 90);
-            path.AddArc(rect.Right - s, rect.Bottom - s, s, s, 0, 90);
-            path.AddArc(rect.X, rect.Bottom - s, s, s, 90, 90);
-            path.CloseFigure();
-            return path;
         }
     }
 }

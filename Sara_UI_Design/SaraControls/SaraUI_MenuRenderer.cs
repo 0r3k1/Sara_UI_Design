@@ -3,6 +3,10 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace Sara_UI_Design.SaraControls {
+
+    /// <summary>
+    /// Motor de renderizado personalizado para menús de Sara UI. 
+    /// </summary>
     public class SaraUI_MenuRenderer:ToolStripProfessionalRenderer {
         private Color primaryColor;
         private Color textColor;
@@ -18,7 +22,6 @@ namespace Sara_UI_Design.SaraControls {
         protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e) {
             e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
             base.OnRenderItemText(e);
-            // El texto cambia al color primario cuando se selecciona
             e.Item.ForeColor = e.Item.Selected ? primaryColor : textColor;
         }
 
@@ -26,7 +29,6 @@ namespace Sara_UI_Design.SaraControls {
             if(e.Item.Selected) {
                 Graphics g = e.Graphics;
                 g.SmoothingMode = SmoothingMode.AntiAlias;
-                // Dibujamos un rectángulo de selección redondeado sutil
                 Rectangle rect = new Rectangle(2, 1, e.Item.Width - 4, e.Item.Height - 2);
                 using(SolidBrush brush = new SolidBrush(Color.FromArgb(30, primaryColor))) {
                     using(GraphicsPath path = GetRoundedPath(rect, 6)) {
@@ -42,8 +44,12 @@ namespace Sara_UI_Design.SaraControls {
             var arrowColor = e.Item.Selected ? primaryColor : Color.DarkGray;
             graph.SmoothingMode = SmoothingMode.AntiAlias;
 
+            // ACABADO REDONDEADO EN FLECHAS DE SUBMENÚS
             using(Pen pen = new Pen(arrowColor, arrowThickness)) {
-                // Dibujamos un chevron moderno en lugar de un triángulo
+                pen.StartCap = LineCap.Round;
+                pen.EndCap = LineCap.Round;
+                pen.LineJoin = LineJoin.Round;
+
                 int x = e.ArrowRectangle.X + (e.ArrowRectangle.Width - arrowSize.Width) / 2;
                 int y = e.ArrowRectangle.Y + (e.ArrowRectangle.Height - arrowSize.Height) / 2;
                 graph.DrawLine(pen, x, y, x + 4, y + 5);

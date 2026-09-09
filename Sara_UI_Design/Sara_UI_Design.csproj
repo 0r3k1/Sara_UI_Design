@@ -1,16 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net8.0-windows;net48</TargetFrameworks>
+		<LangVersion Condition="'$(TargetFramework)' == 'net48'">10.0</LangVersion>
+		<Nullable>enable</Nullable>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<PackageId>Sara_UI_Design</PackageId>
+		<Version>1.1.1</Version>
+		<Authors>CristobalRodas</Authors>
+		<Description>Biblioteca de controles modernos para WinForms con GridPanel, SideBar, Menús avanzados, selectores suaves y IconLibrary dinámica.</Description>
+		<PackageProjectUrl>https://github.com/0r3k1/Sara_UI_Design</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/0r3k1/Sara_UI_Design.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>winforms;controles;interfaz;ui;net-framework</PackageTags>
+		<PackageIcon>logo.png</PackageIcon>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Reference Include="WinFormAnimation">
-      <HintPath>..\..\Bibliotecas\WinFormAnimation.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="logo.png" Pack="true" PackagePath="\" />
+		<None Include="..\README.md" Pack="true" PackagePath="\" Link="README.md" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" PrivateAssets="all" />
+	</ItemGroup>
 
 </Project>
