@@ -732,7 +732,15 @@ namespace Sara_UI_Design.Demo {
             Label titleLabel = CreateLabel(
                 "Pruebas de SaraUI_SideBar",
                 new Point(24, 488),
-                new Size(520, 28));
+                new Size(380, 28));
+
+            Button tabControlDemoButton = CreateActionButton("Probar pestañas");
+            tabControlDemoButton.Location = new Point(424, 482);
+            tabControlDemoButton.TabIndex = 7;
+            tabControlDemoButton.Click += (_, _) => {
+                using TabControlDemoForm demoForm = new TabControlDemoForm();
+                demoForm.ShowDialog(this);
+            };
 
             Panel sideBarHost = new Panel {
                 BackColor = Color.FromArgb(238, 238, 248),
@@ -800,6 +808,7 @@ namespace Sara_UI_Design.Demo {
             sideBarHost.Controls.Add(resumeButton);
             sideBarHost.Controls.Add(stopButton);
             panel2.Controls.Add(titleLabel);
+            panel2.Controls.Add(tabControlDemoButton);
             panel2.Controls.Add(sideBarHost);
 
             ResizeMenuButtons();

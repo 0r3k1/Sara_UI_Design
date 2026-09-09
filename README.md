@@ -13,6 +13,7 @@ Una biblioteca de controles personalizados para **Windows Forms sobre .NET**, en
 - **SaraUI_ToggleButton**: interruptor animado con estados de interacción y soporte de tres estados.
 - **SaraUI_ComboBox**: lista desplegable compuesta con datos, estados accesibles y transiciones visuales.
 - **SaraUI_DatePicker**: selector de fecha nativo con superficie redondeada y estados animados.
+- **SaraUI_TabControl**: pestañas animadas con navegación, cierre cancelable y estados accesibles.
 - **SaraUI_ScrollBar**: desplazamiento horizontal o vertical con arrastre, teclado y estados animados.
 - **SaraUI_PictureBox**: imágenes circulares con bordes degradados.
 - **SaraUI_RadioButton**: botón de opción animado con estados de interacción y navegación accesible.
@@ -147,6 +148,20 @@ appointmentDate.AnimationDuration = 220;
 ```
 
 El calendario puede controlarse mediante `OpenDropDown` y `CloseDropDown`; el primer método devuelve `false` si el selector está deshabilitado o usa `ShowUpDown`. `IsDropDownOpen`, `VisualState`, `AnimationState` y `DisplayedDropDownProgress` permiten observar el comportamiento sin sustituir la lógica nativa. Las transiciones pueden pausarse, reanudarse o detenerse mediante `PauseAnimation`, `ResumeAnimation` y `StopAnimation`.
+
+`SaraUI_TabControl` conserva `TabPages`, `SelectedIndex`, `SelectedTab`, `Selecting` y `SelectedIndexChanged` de Windows Forms. Anima el indicador de selección y los colores de hover y presión, permite repartir los encabezados con `StretchTabs` y admite iconos tanto por índice como por clave:
+
+```csharp
+workspaceTabs.SelectedTabColor = Color.MediumSlateBlue;
+workspaceTabs.UnselectedTabColor = Color.FromArgb(230, 230, 240);
+workspaceTabs.IndicatorColor = Color.HotPink;
+workspaceTabs.StretchTabs = true;
+workspaceTabs.ShowCloseButtons = true;
+workspaceTabs.AnimationDuration = 320;
+workspaceTabs.AnimationEasing = SaraEasing.EaseInOutCubic;
+```
+
+`Ctrl+Tab` y `Ctrl+Mayús+Tab` recorren únicamente páginas habilitadas. Cuando se muestran botones de cierre, `Ctrl+W` solicita cerrar la página seleccionada. `TabClosing` permite cancelar la operación y `TabClosed` informa la página retirada. `CloseTab` elimina la página de `TabPages`, pero no llama a `Dispose`; el consumidor conserva la responsabilidad sobre su ciclo de vida. Las animaciones pueden pausarse, reanudarse o detenerse mediante `PauseAnimation`, `ResumeAnimation` y `StopAnimation`.
 
 `SaraUI_ScrollBar` mantiene un valor lógico entero y una posición visual interpolada. Admite orientación horizontal o vertical, clic por páginas en el canal, arrastre con captura del ratón, rueda, flechas, `PageUp`, `PageDown`, `Home` y `End`:
 
