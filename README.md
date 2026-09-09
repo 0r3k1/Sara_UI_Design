@@ -163,6 +163,20 @@ workspaceTabs.AnimationEasing = SaraEasing.EaseInOutCubic;
 
 `Ctrl+Tab` y `Ctrl+Mayús+Tab` recorren únicamente páginas habilitadas. Cuando se muestran botones de cierre, `Ctrl+W` solicita cerrar la página seleccionada. `TabClosing` permite cancelar la operación y `TabClosed` informa la página retirada. `CloseTab` elimina la página de `TabPages`, pero no llama a `Dispose`; el consumidor conserva la responsabilidad sobre su ciclo de vida. Las animaciones pueden pausarse, reanudarse o detenerse mediante `PauseAnimation`, `ResumeAnimation` y `StopAnimation`.
 
+`SaraUI_FlexPanel` distribuye los controles visibles siguiendo el orden de `Controls` y respeta tanto el `Padding` del contenedor como el `Margin` de cada elemento. Admite filas, columnas, envoltura, seis formas de distribución y alineación transversal:
+
+```csharp
+flexPanel.Direction = SaraUI_FlexPanel.FlexDirection.Row;
+flexPanel.Justify = SaraUI_FlexPanel.JustifyContent.SpaceEvenly;
+flexPanel.WrapContents = SaraUI_FlexPanel.FlexWrap.Wrap;
+flexPanel.AlignItems = SaraUI_FlexPanel.FlexAlignment.Center;
+flexPanel.ChildSpacing = 12;
+flexPanel.AnimationEnabled = true;
+flexPanel.AnimationDuration = 600;
+```
+
+Los controles con `Dock` permanecen bajo el layout nativo de Windows Forms y el contenido flexible utiliza el espacio restante. `RightToLeft` invierte el avance horizontal y las columnas envueltas. `FlexAlignment.Auto` conserva el comportamiento histórico: inicio en filas y centro en columnas. Una reorganización puede pausarse, reanudarse o finalizar inmediatamente mediante `PauseAnimation`, `ResumeAnimation` y `StopAnimation`.
+
 `SaraUI_ScrollBar` mantiene un valor lógico entero y una posición visual interpolada. Admite orientación horizontal o vertical, clic por páginas en el canal, arrastre con captura del ratón, rueda, flechas, `PageUp`, `PageDown`, `Home` y `End`:
 
 ```csharp

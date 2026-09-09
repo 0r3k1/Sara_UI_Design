@@ -732,11 +732,19 @@ namespace Sara_UI_Design.Demo {
             Label titleLabel = CreateLabel(
                 "Pruebas de SaraUI_SideBar",
                 new Point(24, 488),
-                new Size(380, 28));
+                new Size(260, 28));
+
+            Button flexPanelDemoButton = CreateActionButton("Probar Flex");
+            flexPanelDemoButton.Location = new Point(298, 482);
+            flexPanelDemoButton.TabIndex = 7;
+            flexPanelDemoButton.Click += (_, _) => {
+                using FlexPanelDemoForm demoForm = new FlexPanelDemoForm();
+                demoForm.ShowDialog(this);
+            };
 
             Button tabControlDemoButton = CreateActionButton("Probar pestañas");
             tabControlDemoButton.Location = new Point(424, 482);
-            tabControlDemoButton.TabIndex = 7;
+            tabControlDemoButton.TabIndex = 8;
             tabControlDemoButton.Click += (_, _) => {
                 using TabControlDemoForm demoForm = new TabControlDemoForm();
                 demoForm.ShowDialog(this);
@@ -808,6 +816,7 @@ namespace Sara_UI_Design.Demo {
             sideBarHost.Controls.Add(resumeButton);
             sideBarHost.Controls.Add(stopButton);
             panel2.Controls.Add(titleLabel);
+            panel2.Controls.Add(flexPanelDemoButton);
             panel2.Controls.Add(tabControlDemoButton);
             panel2.Controls.Add(sideBarHost);
 
