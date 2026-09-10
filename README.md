@@ -177,6 +177,20 @@ flexPanel.AnimationDuration = 600;
 
 Los controles con `Dock` permanecen bajo el layout nativo de Windows Forms y el contenido flexible utiliza el espacio restante. `RightToLeft` invierte el avance horizontal y las columnas envueltas. `FlexAlignment.Auto` conserva el comportamiento histórico: inicio en filas y centro en columnas. Una reorganización puede pausarse, reanudarse o finalizar inmediatamente mediante `PauseAnimation`, `ResumeAnimation` y `StopAnimation`.
 
+`SaraUI_ShadowPanel` extiende la distribución de `SaraUI_FlexPanel` con una superficie redondeada, borde opcional y sombra difusa cacheada. Su propiedad `Padding` representa exclusivamente el espacio del contenido; la reserva direccional necesaria para la sombra se calcula de forma independiente y puede consultarse mediante `ShadowInsets`:
+
+```csharp
+shadowPanel.Padding = new Padding(24);
+shadowPanel.ShadowSize = 18;
+shadowPanel.SetShadowOffset(8, 12);
+shadowPanel.ShadowOpacity = 120;
+shadowPanel.ShadowFocusScale = 0.72f;
+shadowPanel.BorderColor = Color.MediumSlateBlue;
+shadowPanel.BorderThickness = 1;
+```
+
+Los offsets positivos reservan más espacio a la derecha o abajo; los negativos lo hacen a la izquierda o arriba. `SetShadowOffset` permite actualizar ambos ejes con una sola reorganización. `ShadowSize` y `ShadowOpacity` admiten cero para desactivar el efecto sin retirar la superficie. La sombra se reconstruye únicamente cuando cambia su geometría o apariencia, mientras el borde y el fondo se repintan sin conservar recursos GDI abiertos. El panel mantiene las opciones heredadas de dirección, envoltura, alineación y animación del contenido.
+
 `SaraUI_ScrollBar` mantiene un valor lógico entero y una posición visual interpolada. Admite orientación horizontal o vertical, clic por páginas en el canal, arrastre con captura del ratón, rueda, flechas, `PageUp`, `PageDown`, `Home` y `End`:
 
 ```csharp

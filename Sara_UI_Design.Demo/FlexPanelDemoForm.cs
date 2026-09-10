@@ -74,6 +74,7 @@ namespace Sara_UI_Design.Demo {
             Button pauseButton = CreateActionButton("Pausar");
             Button resumeButton = CreateActionButton("Reanudar");
             Button stopButton = CreateActionButton("Detener");
+            Button shadowPanelButton = CreateActionButton("Probar sombras");
 
             int CountFlexItems() {
                 int count = 0;
@@ -174,6 +175,10 @@ namespace Sara_UI_Design.Demo {
                 lastAction = flexPanel.StopAnimation() ? "animación detenida" : "sin animación activa";
                 UpdateStatus();
             };
+            shadowPanelButton.Click += (_, _) => {
+                using ShadowPanelDemoForm demoForm = new ShadowPanelDemoForm();
+                demoForm.ShowDialog(this);
+            };
 
             flexPanel.AnimationCompleted += (_, _) => {
                 completedCount++;
@@ -195,6 +200,7 @@ namespace Sara_UI_Design.Demo {
             actionsPanel.Controls.Add(pauseButton);
             actionsPanel.Controls.Add(resumeButton);
             actionsPanel.Controls.Add(stopButton);
+            actionsPanel.Controls.Add(shadowPanelButton);
 
             Label instructionsLabel = new Label {
                 Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,

@@ -318,6 +318,14 @@ namespace Sara_UI_Design.SaraControls {
         [Browsable(false)]
         public SaraAnimationState AnimationState => _layoutAnimator.State;
 
+        /// <summary>
+        /// Obtiene si el panel debe recortar su superficie exterior mediante
+        /// <see cref="BorderRadius"/>.
+        /// </summary>
+        /// <remarks>Los controles derivados que dibujan fuera de su superficie pueden desactivarlo.</remarks>
+        [Browsable(false)]
+        protected virtual bool ApplyRoundedControlRegion => true;
+
         /// <summary>Pausa la reorganización activa conservando las posiciones actuales.</summary>
         /// <returns><see langword="true"/> si la animación cambió al estado pausado.</returns>
         public bool PauseAnimation() {
@@ -386,11 +394,7 @@ namespace Sara_UI_Design.SaraControls {
                 _layoutAnimator.Dispose();
                 _activeTransitions.Clear();
 
-                if(_managedRegion != null) {
-                    Region = null;
-                    _managedRegion.Dispose();
-                    _managedRegion = null;
-                }
+                ReleaseManagedRegion();
 
                 AnimationCompleted = null;
                 AnimationCanceled = null;
@@ -889,6 +893,11 @@ namespace Sara_UI_Design.SaraControls {
         }
 
         private void UpdateRoundedRegion() {
+            if(!ApplyRoundedControlRegion) {
+                ReleaseManagedRegion();
+                return;
+            }
+
             Rectangle bounds = ClientRectangle;
             int radius = Math.Min(
                 _borderRadius,
@@ -910,6 +919,18 @@ namespace Sara_UI_Design.SaraControls {
             Region = nextRegion;
             _managedRegion?.Dispose();
             _managedRegion = nextRegion;
+        }
+
+        private void ReleaseManagedRegion() {
+            if(_managedRegion == null) {
+                return;
+            }
+
+            Region = null;
+            _managedRegion.Dispose();
+            _managedRegion = null;
+            _managedRegionBounds = Rectangle.Empty;
+            _managedRegionRadius = -1;
         }
 
         private bool IsManagedControl(Control control) {
