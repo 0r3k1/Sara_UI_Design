@@ -191,6 +191,21 @@ shadowPanel.BorderThickness = 1;
 
 Los offsets positivos reservan más espacio a la derecha o abajo; los negativos lo hacen a la izquierda o arriba. `SetShadowOffset` permite actualizar ambos ejes con una sola reorganización. `ShadowSize` y `ShadowOpacity` admiten cero para desactivar el efecto sin retirar la superficie. La sombra se reconstruye únicamente cuando cambia su geometría o apariencia, mientras el borde y el fondo se repintan sin conservar recursos GDI abiertos. El panel mantiene las opciones heredadas de dirección, envoltura, alineación y animación del contenido.
 
+`SaraUI_GridPanel` combina pistas fijas y fraccionales y ajusta sus cálculos al espacio disponible sin producir tamaños negativos. Los valores fijos aceptan números o el sufijo `px`; las fracciones usan `fr` y siempre se interpretan con cultura invariable:
+
+```csharp
+gridPanel.SetGridTemplate("140px, 1fr, 2fr", "80px, 1fr, 1fr");
+gridPanel.SetGaps(16, 12);
+gridPanel.Padding = new Padding(20);
+gridPanel.AnimationEnabled = true;
+gridPanel.AnimationDuration = 500;
+
+SaraUI_GridPanel.SetGridPosition(header, 0, 0, 1, 3);
+SaraUI_GridPanel.SetGridPosition(sidebar, 1, 0, 2, 1);
+```
+
+Las posiciones y spans nuevos se conservan en metadatos asociados al control y no modifican `Control.Tag`. Para mantener compatibilidad, un `Tag` textual con formato `"fila,columna"` todavía se interpreta como posición histórica. Los controles sin posición explícita ocupan las celdas libres siguiendo el orden de `Controls`; los que no encuentran espacio permanecen fuera del área visible y `UnplacedControlCount` informa cuántos son. `Margin`, `Padding`, alineaciones, `RightToLeft` y controles con `Dock` se procesan de forma explícita. Una reorganización puede pausarse, reanudarse o finalizar mediante `PauseAnimation`, `ResumeAnimation` y `StopAnimation`; el arrastre opcional del formulario usa captura del ratón y se cancela de forma segura.
+
 `SaraUI_ScrollBar` mantiene un valor lógico entero y una posición visual interpolada. Admite orientación horizontal o vertical, clic por páginas en el canal, arrastre con captura del ratón, rueda, flechas, `PageUp`, `PageDown`, `Home` y `End`:
 
 ```csharp

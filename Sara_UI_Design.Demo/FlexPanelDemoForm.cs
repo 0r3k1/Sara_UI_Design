@@ -75,6 +75,7 @@ namespace Sara_UI_Design.Demo {
             Button resumeButton = CreateActionButton("Reanudar");
             Button stopButton = CreateActionButton("Detener");
             Button shadowPanelButton = CreateActionButton("Probar sombras");
+            Button gridPanelButton = CreateActionButton("Probar Grid");
 
             int CountFlexItems() {
                 int count = 0;
@@ -179,6 +180,10 @@ namespace Sara_UI_Design.Demo {
                 using ShadowPanelDemoForm demoForm = new ShadowPanelDemoForm();
                 demoForm.ShowDialog(this);
             };
+            gridPanelButton.Click += (_, _) => {
+                using GridPanelDemoForm demoForm = new GridPanelDemoForm();
+                demoForm.ShowDialog(this);
+            };
 
             flexPanel.AnimationCompleted += (_, _) => {
                 completedCount++;
@@ -201,6 +206,7 @@ namespace Sara_UI_Design.Demo {
             actionsPanel.Controls.Add(resumeButton);
             actionsPanel.Controls.Add(stopButton);
             actionsPanel.Controls.Add(shadowPanelButton);
+            actionsPanel.Controls.Add(gridPanelButton);
 
             Label instructionsLabel = new Label {
                 Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
