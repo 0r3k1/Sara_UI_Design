@@ -206,6 +206,22 @@ SaraUI_GridPanel.SetGridPosition(sidebar, 1, 0, 2, 1);
 
 Las posiciones y spans nuevos se conservan en metadatos asociados al control y no modifican `Control.Tag`. Para mantener compatibilidad, un `Tag` textual con formato `"fila,columna"` todavía se interpreta como posición histórica. Los controles sin posición explícita ocupan las celdas libres siguiendo el orden de `Controls`; los que no encuentran espacio permanecen fuera del área visible y `UnplacedControlCount` informa cuántos son. `Margin`, `Padding`, alineaciones, `RightToLeft` y controles con `Dock` se procesan de forma explícita. Una reorganización puede pausarse, reanudarse o finalizar mediante `PauseAnimation`, `ResumeAnimation` y `StopAnimation`; el arrastre opcional del formulario usa captura del ratón y se cancela de forma segura.
 
+`SaraUI_PictureBox` conserva la API de `PictureBox` para `Image`, `ImageLocation`, `InitialImage`, `ErrorImage`, `WaitOnLoad` y `SizeMode`, y añade recorte circular o rectangular con bordes redondeados y degradados:
+
+```csharp
+avatar.Image = profileImage;
+avatar.SizeMode = PictureBoxSizeMode.Zoom;
+avatar.IsCircular = true;
+avatar.MaintainCircularAspectRatio = true;
+avatar.ClipToShape = true;
+avatar.BorderSize = 6;
+avatar.BorderColor = Color.MediumSlateBlue;
+avatar.BorderColor2 = Color.HotPink;
+avatar.AnimationDuration = 180;
+```
+
+La proporción circular continúa gobernada por el ancho para conservar compatibilidad; `MaintainCircularAspectRatio = false` permite elipses cuando un contenedor administra ambas dimensiones. El grosor y el radio efectivos se limitan al espacio disponible, por lo que los tamaños mínimos no producen geometría negativa. La región solo se reconstruye al cambiar forma o tamaño y se libera sin destruir regiones externas. Los estados de hover, foco y deshabilitación pueden personalizar sus colores y utilizan el motor propio; la imagen sigue perteneciendo al consumidor y el control no la desecha al reemplazarla.
+
 `SaraUI_ScrollBar` mantiene un valor lógico entero y una posición visual interpolada. Admite orientación horizontal o vertical, clic por páginas en el canal, arrastre con captura del ratón, rueda, flechas, `PageUp`, `PageDown`, `Home` y `End`:
 
 ```csharp
