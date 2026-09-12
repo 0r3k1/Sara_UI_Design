@@ -19,6 +19,7 @@ Una biblioteca de controles personalizados para **Windows Forms sobre .NET**, en
 - **SaraUI_RadioButton**: botón de opción animado con estados de interacción y navegación accesible.
 - **SaraUI_Line**: separador horizontal o vertical con trazos, degradados y estados animados.
 - **SaraUI_SideBar**: barra lateral expandible con animaciones temporales y estados observables.
+- **Paquete de menús**: barra principal, menú contextual, renderer y paleta con temas recursivos.
 
 ## 🚀 Instalación
 
@@ -236,6 +237,23 @@ separator.EndCap = LineCap.Round;
 ```
 
 En líneas horizontales, `RightToLeft` invierte el inicio y el final lógicos, incluido el sentido del degradado y de los remates. El grosor efectivo se limita al espacio transversal disponible para evitar geometría inválida en tamaños mínimos. `DashStyle.Custom` y `LineCap.Custom` se rechazan porque requieren recursos externos que el control no administra. De manera predeterminada, el separador no participa en el orden de tabulación; si se activa `TabStop`, puede recibir foco, mostrar una guía accesible y animar sus colores. Las transiciones de hover, foco y deshabilitación se pueden pausar, reanudar o detener mediante `PauseAnimation`, `ResumeAnimation` y `StopAnimation`.
+
+El paquete de menús está compuesto por `SaraUI_MenuStrip`, `SaraUI_DropdownMenu`, `SaraUI_MenuRenderer` y `SaraUI_MenuColorTable`. La barra y el menú contextual administran la configuración pública; el renderer se limita a dibujar y la tabla de colores describe la paleta utilizada por Windows Forms:
+
+```csharp
+mainMenu.PrimaryColor = Color.MediumSlateBlue;
+mainMenu.MenuItemTextColor = Color.Gainsboro;
+mainMenu.DropDownItemHeight = 36;
+mainMenu.SelectionCornerRadius = 8;
+mainMenu.SelectionOpacity = 48;
+
+contextMenu.PrimaryColor = mainMenu.PrimaryColor;
+contextMenu.MenuItemHeight = 36;
+contextMenu.ShowImageMargin = true;
+contextMenu.RefreshTheme();
+```
+
+El tema se propaga a todos los niveles de submenús y puede reconstruirse mediante `RefreshTheme` después de agregar elementos dinámicos. Las alturas opcionales se ajustan al DPI y pueden devolverse al tamaño nativo desactivando `ApplyUniformDropDownItemHeight` o `ApplyUniformItemHeight`. Los estados seleccionado, presionado y deshabilitado se representan sin modificar `ForeColor`, `Text`, `Tag`, `Checked`, `Enabled` ni los atajos del elemento. La navegación, los mnemónicos, las teclas de dirección, `Enter`, `Esc` y los accesos directos continúan bajo la administración nativa de `MenuStrip` y `ContextMenuStrip`.
 
 `SaraUI_ScrollBar` mantiene un valor lógico entero y una posición visual interpolada. Admite orientación horizontal o vertical, clic por páginas en el canal, arrastre con captura del ratón, rueda, flechas, `PageUp`, `PageDown`, `Home` y `End`:
 

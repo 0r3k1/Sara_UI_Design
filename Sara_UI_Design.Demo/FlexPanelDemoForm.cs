@@ -78,6 +78,7 @@ namespace Sara_UI_Design.Demo {
             Button gridPanelButton = CreateActionButton("Probar Grid");
             Button pictureBoxButton = CreateActionButton("Probar imágenes");
             Button lineButton = CreateActionButton("Probar líneas");
+            Button menuButton = CreateActionButton("Probar menús");
 
             int CountFlexItems() {
                 int count = 0;
@@ -194,6 +195,10 @@ namespace Sara_UI_Design.Demo {
                 using LineDemoForm demoForm = new LineDemoForm();
                 demoForm.ShowDialog(this);
             };
+            menuButton.Click += (_, _) => {
+                using MenuDemoForm demoForm = new MenuDemoForm();
+                demoForm.ShowDialog(this);
+            };
 
             flexPanel.AnimationCompleted += (_, _) => {
                 completedCount++;
@@ -219,6 +224,7 @@ namespace Sara_UI_Design.Demo {
             actionsPanel.Controls.Add(gridPanelButton);
             actionsPanel.Controls.Add(pictureBoxButton);
             actionsPanel.Controls.Add(lineButton);
+            actionsPanel.Controls.Add(menuButton);
 
             Label instructionsLabel = new Label {
                 Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
