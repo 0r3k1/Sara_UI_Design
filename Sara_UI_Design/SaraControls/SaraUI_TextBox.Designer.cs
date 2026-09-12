@@ -36,9 +36,9 @@
             textBox1.Name = "textBox1";
             textBox1.Size = new Size(236, 16);
             textBox1.TabIndex = 0;
-            // 
+            //
             // SaraUI_TextBox
-            // 
+            //
             AutoScaleMode = AutoScaleMode.None;
             BackColor = SystemColors.Window;
             Controls.Add(textBox1);

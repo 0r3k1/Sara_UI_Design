@@ -1,0 +1,2 @@
+# Los archivos generados por el diseñador de Windows Forms pueden contener espacios finales.
+*.Designer.cs whitespace=-blank-at-eol
