@@ -77,6 +77,7 @@ namespace Sara_UI_Design.Demo {
             Button shadowPanelButton = CreateActionButton("Probar sombras");
             Button gridPanelButton = CreateActionButton("Probar Grid");
             Button pictureBoxButton = CreateActionButton("Probar imágenes");
+            Button lineButton = CreateActionButton("Probar líneas");
 
             int CountFlexItems() {
                 int count = 0;
@@ -189,6 +190,10 @@ namespace Sara_UI_Design.Demo {
                 using PictureBoxDemoForm demoForm = new PictureBoxDemoForm();
                 demoForm.ShowDialog(this);
             };
+            lineButton.Click += (_, _) => {
+                using LineDemoForm demoForm = new LineDemoForm();
+                demoForm.ShowDialog(this);
+            };
 
             flexPanel.AnimationCompleted += (_, _) => {
                 completedCount++;
@@ -213,6 +218,7 @@ namespace Sara_UI_Design.Demo {
             actionsPanel.Controls.Add(shadowPanelButton);
             actionsPanel.Controls.Add(gridPanelButton);
             actionsPanel.Controls.Add(pictureBoxButton);
+            actionsPanel.Controls.Add(lineButton);
 
             Label instructionsLabel = new Label {
                 Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,

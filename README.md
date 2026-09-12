@@ -17,7 +17,7 @@ Una biblioteca de controles personalizados para **Windows Forms sobre .NET**, en
 - **SaraUI_ScrollBar**: desplazamiento horizontal o vertical con arrastre, teclado y estados animados.
 - **SaraUI_PictureBox**: imágenes circulares con bordes degradados.
 - **SaraUI_RadioButton**: botón de opción animado con estados de interacción y navegación accesible.
-- **SaraUI_Line**: separador horizontal o vertical.
+- **SaraUI_Line**: separador horizontal o vertical con trazos, degradados y estados animados.
 - **SaraUI_SideBar**: barra lateral expandible con animaciones temporales y estados observables.
 
 ## 🚀 Instalación
@@ -221,6 +221,21 @@ avatar.AnimationDuration = 180;
 ```
 
 La proporción circular continúa gobernada por el ancho para conservar compatibilidad; `MaintainCircularAspectRatio = false` permite elipses cuando un contenedor administra ambas dimensiones. El grosor y el radio efectivos se limitan al espacio disponible, por lo que los tamaños mínimos no producen geometría negativa. La región solo se reconstruye al cambiar forma o tamaño y se libera sin destruir regiones externas. Los estados de hover, foco y deshabilitación pueden personalizar sus colores y utilizan el motor propio; la imagen sigue perteneciendo al consumidor y el control no la desecha al reemplazarla.
+
+`SaraUI_Line` conserva `Orientation`, `LineWidth`, `LineColor` y `LineStyle`, y añade alineación transversal, degradado opcional, `Padding`, remates independientes y escalado opcional del grosor según el DPI:
+
+```csharp
+separator.Orientation = SaraUI_Line.LineOrientation.Horizontal;
+separator.Alignment = SaraUI_Line.LineAlignment.Center;
+separator.Padding = new Padding(16, 8, 16, 8);
+separator.LineWidth = 4;
+separator.LineColor = Color.MediumSlateBlue;
+separator.LineColor2 = Color.HotPink;
+separator.StartCap = LineCap.Round;
+separator.EndCap = LineCap.Round;
+```
+
+En líneas horizontales, `RightToLeft` invierte el inicio y el final lógicos, incluido el sentido del degradado y de los remates. El grosor efectivo se limita al espacio transversal disponible para evitar geometría inválida en tamaños mínimos. `DashStyle.Custom` y `LineCap.Custom` se rechazan porque requieren recursos externos que el control no administra. De manera predeterminada, el separador no participa en el orden de tabulación; si se activa `TabStop`, puede recibir foco, mostrar una guía accesible y animar sus colores. Las transiciones de hover, foco y deshabilitación se pueden pausar, reanudar o detener mediante `PauseAnimation`, `ResumeAnimation` y `StopAnimation`.
 
 `SaraUI_ScrollBar` mantiene un valor lógico entero y una posición visual interpolada. Admite orientación horizontal o vertical, clic por páginas en el canal, arrastre con captura del ratón, rueda, flechas, `PageUp`, `PageDown`, `Home` y `End`:
 
