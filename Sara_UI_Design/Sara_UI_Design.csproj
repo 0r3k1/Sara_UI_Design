@@ -7,17 +7,18 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<PackageId>Sara_UI_Design</PackageId>
-		<Version>1.1.1</Version>
+		<Version>2.0.0</Version>
 		<Authors>CristobalRodas</Authors>
-		<Description>Biblioteca de controles modernos para WinForms con GridPanel, SideBar, Menús avanzados, selectores suaves y IconLibrary dinámica.</Description>
+		<Description>Biblioteca de controles personalizables para Windows Forms compatible con .NET 8 y .NET Framework 4.8. Incluye animaciones, paneles de diseño, menús e iconos vectoriales.</Description>
 		<PackageProjectUrl>https://github.com/0r3k1/Sara_UI_Design</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/0r3k1/Sara_UI_Design.git</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<PackageTags>winforms;controles;interfaz;ui;net-framework</PackageTags>
+		<PackageTags>winforms;controles;interfaz;ui;net8;net48;animaciones;iconos</PackageTags>
 		<PackageIcon>logo.png</PackageIcon>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageReleaseNotes>2.0.0: motor de animaciones propio, controles modernizados, compatibilidad con .NET 8 y .NET Framework 4.8, biblioteca de iconos ampliada y manual oficial.</PackageReleaseNotes>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -1,2 +1,4 @@
 # Los archivos generados por el diseñador de Windows Forms pueden contener espacios finales.
 *.Designer.cs whitespace=-blank-at-eol
+docs/*.pdf binary
+docs/Manual_Sara_UI_Design_2.0.0.md whitespace=-blank-at-eol

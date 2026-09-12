@@ -324,6 +324,11 @@ También puedes establecer `Sara_UI_Design.Demo` como proyecto de inicio desde V
 
 La biblioteca genera documentación XML para IntelliSense. Visual Studio puede mostrar descripciones de las propiedades, los eventos y los métodos públicos documentados.
 
+Manual oficial de Sara UI Design 2.0.0:
+
+- [Leer el manual en Markdown](https://github.com/0r3k1/Sara_UI_Design/blob/v2.0.0/docs/Manual_Sara_UI_Design_2.0.0.md)
+- [Ver o descargar el manual en PDF](https://github.com/0r3k1/Sara_UI_Design/blob/v2.0.0/docs/Manual_Sara_UI_Design_2.0.0.pdf)
+
 ## 📄 Licencia
 
 Este proyecto utiliza la Licencia MIT. Puede usarse, modificarse y distribuirse conservando el aviso de derechos de autor correspondiente.
