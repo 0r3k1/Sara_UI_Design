@@ -101,6 +101,9 @@ namespace Sara_UI_Design.SaraControls {
         [Browsable(true)]
         [EditorBrowsable(EditorBrowsableState.Always)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+#if NET8_0_OR_GREATER
+        [System.Diagnostics.CodeAnalysis.AllowNull]
+#endif
         public override string Text {
             get => base.Text ?? string.Empty;
             set => SetLogicalText(value ?? string.Empty, true);
