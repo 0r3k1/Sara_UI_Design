@@ -269,6 +269,29 @@ contentScroll.Value = 40;
 
 `DisplayedValue` permite observar la posición animada sin alterar el destino expuesto por `Value`. Durante el arrastre, el indicador sigue directamente al puntero y genera eventos `Scroll` de tipo `ThumbTrack`; `ValueChanged` se genera una sola vez por cada valor lógico diferente. `RightToLeft` invierte automáticamente una barra horizontal, mientras `ReverseDirection` permite invertir cualquiera de los dos ejes. Las transiciones pueden pausarse, reanudarse o detenerse mediante `PauseAnimation`, `ResumeAnimation` y `StopAnimation`.
 
+`SaraUI_IconLibrary` ofrece un catálogo vectorial clasificado que no depende de fuentes de iconos ni de archivos externos. Los nombres canónicos son los que aparecen en el diseñador; los nombres históricos repetidos continúan resolviéndose como alias para no romper formularios guardados:
+
+```csharp
+SaraUI_IconLibrary.DrawIcon(
+    "InventoryLoad",
+    graphics,
+    new Rectangle(0, 0, 32, 32),
+    Color.MediumSlateBlue);
+
+bool known = SaraUI_IconLibrary.TryDrawIcon(
+    "Update",
+    graphics,
+    iconBounds,
+    Color.DodgerBlue,
+    SaraUI_IconLibrary.SaraIconStyle.Rounded);
+```
+
+Los casos habituales de una biblioteca o inventario se representan mediante `Add`, `Update`, `Delete`, `Refresh`, `InventoryLoad`, `Code`, `Title`, `Author` y `Genre`. El catálogo también incorpora `Save`, `Undo`, `Redo`, `Import`, `Export`, `Print`, `Archive`, `Attachment`, `DocumentAdd`, `FolderOpen`, `Table`, `List`, `Package`, `Inventory`, `Warehouse`, `Barcode`, `Cart`, `Receipt`, `Book`, `Monitor`, `Server`, `Window` y `Camera`.
+
+Las siluetas mantienen una dirección visual consistente: `Undo` apunta a la izquierda, `Redo` a la derecha y `Refresh` representa un giro horario. `Edit` utiliza un lápiz completo; `Lock`, `Unlock` y `LockKey` diferencian el estado del arco y el ojo de la cerradura. Los símbolos de comunicación, ayuda, conectividad y sistema conservan sus rasgos reconocibles incluso al dibujarse a 16 px. La ventana de demostración permite comprobar cada símbolo a 16, 24, 32 y 48 px antes de incorporarlo a una interfaz.
+
+`GetIconCatalog` devuelve nombre, categoría, descripción, nombre canónico e indicador de alias. `GetAvailableIcons` expone solamente los nombres canónicos, por lo que el selector no muestra duplicados como `Plus`/`Add`, `Trash`/`Delete`, `Reload`/`Refresh` o `Settings`/`Gear`. Esos nombres anteriores, además de equivalentes en español como `Agregar`, `Actualizar`, `Eliminar` y `CargarExistencia`, siguen funcionando al dibujar. Un nombre desconocido o límites demasiado pequeños hacen que `TryDrawIcon` devuelva `false` sin pintar un cuadro rojo ni interrumpir el diseñador.
+
 `SaraUI_ProgressBar` separa el valor lógico solicitado del valor interpolado que se está dibujando. Admite progreso determinado, segmento indeterminado, degradado, texto deslizante y dirección de derecha a izquierda:
 
 ```csharp
